@@ -1,0 +1,5 @@
+projects:
+  - name: "demo_banking"
+  - name: "demo_banking_insurance"
+  - name: "demo_banking_wealth"
+  - name: "demo_banking_financials"

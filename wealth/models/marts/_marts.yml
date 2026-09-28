@@ -1,0 +1,63 @@
+version: 2
+
+models:
+  - name: wealth_customer
+    description: >
+      Public wealth client. Grain is one row per client. party_key lines
+      this book up with banking and insurance.
+    config:
+      access: public
+      contract:
+        enforced: true
+    columns:
+      - name: wealth_customer_id
+        description: Wealth client key.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [unique, not_null]
+      - name: party_key
+        description: Group party key. One wealth client maps to one party.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [unique, not_null]
+      - name: client_status
+        description: Lifecycle of the wealth relationship.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              arguments:
+                values: [active, inactive, closed]
+
+  - name: wealth_portfolios
+    description: >
+      Public portfolio holdings for each wealth client. Grain is one row
+      per client. Closed portfolios stay in the source and drop out of
+      the count and assets.
+    config:
+      access: public
+      contract:
+        enforced: true
+    columns:
+      - name: wealth_customer_id
+        description: Wealth client key. Matches wealth_customer.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('wealth_customer')
+                field: wealth_customer_id
+      - name: portfolio_count
+        description: Open portfolios.
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: assets_under_management
+        description: Sum of open portfolio market value.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]

@@ -1,0 +1,69 @@
+version: 2
+
+models:
+  - name: banking_customer
+    description: >
+      Public banking customer. Grain is one row per banking customer.
+      party_key is the group key Customer 360 uses to line this book up
+      with insurance and wealth. Downstream projects should ref this model
+      rather than the banking seeds.
+    config:
+      access: public
+      contract:
+        enforced: true
+    columns:
+      - name: banking_customer_id
+        description: Bank customer key from the core system.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [unique, not_null]
+      - name: party_key
+        description: Group party key. One banking customer maps to one party.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [unique, not_null]
+      - name: customer_status
+        description: Lifecycle of the banking relationship.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              arguments:
+                values: [active, inactive, closed]
+
+  - name: banking_products
+    description: >
+      Public product holdings for each banking customer. Grain is one row
+      per banking customer, including customers with no open accounts or loans.
+      Counts include open accounts and outstanding loans only.
+    config:
+      access: public
+      contract:
+        enforced: true
+    columns:
+      - name: banking_customer_id
+        description: Bank customer key. Matches banking_customer.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('banking_customer')
+                field: banking_customer_id
+      - name: account_count
+        description: Open deposit and card accounts.
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: loan_count
+        description: Loan facilities still outstanding.
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: loan_balance
+        description: Sum of outstanding principal. Credits and overpayments can push this negative when the feed is wrong.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]

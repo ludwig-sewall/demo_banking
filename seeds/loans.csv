@@ -1,0 +1,7 @@
+loan_id,banking_customer_id,loan_status,balance,product_name
+L-01,B-1001,outstanding,420000.00,mortgage
+L-02,B-1002,outstanding,480000.00,mortgage
+L-03,B-1002,outstanding,130000.00,personal
+L-04,B-1005,closed,0.00,auto
+L-05,B-1006,outstanding,18000.00,auto
+L-06,B-1010,outstanding,-2500.00,working_capital

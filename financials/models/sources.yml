@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: financials
+    description: >
+      Management accounting at party grain. Revenue is transactional.
+      Cost is an allocation, and some party-months are missing a cost.
+    schema: "{{ target.schema }}_financials_seeds"
+    tables:
+      - name: revenue_transactions
+        description: One row per revenue posting. Amount can be null when the posting failed to price.
+        config:
+          loaded_at_field: loaded_at
+          freshness:
+            warn_after: {count: 100000, period: hour}
+      - name: allocated_costs
+        description: One row per party per month. Cost is null when finance has not allocated yet.

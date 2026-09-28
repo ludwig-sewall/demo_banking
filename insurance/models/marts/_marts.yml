@@ -1,0 +1,63 @@
+version: 2
+
+models:
+  - name: insurance_customer
+    description: >
+      Public insurance customer. Grain is one row per insurance customer.
+      party_key lines this book up with banking and wealth.
+    config:
+      access: public
+      contract:
+        enforced: true
+    columns:
+      - name: insurance_customer_id
+        description: Policy-admin customer key.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [unique, not_null]
+      - name: party_key
+        description: Group party key. One insurance customer maps to one party.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [unique, not_null]
+      - name: customer_status
+        description: Lifecycle of the insurance relationship.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              arguments:
+                values: [active, inactive, closed]
+
+  - name: insurance_policies
+    description: >
+      Public in-force cover for each insurance customer. Grain is one row
+      per insurance customer. Lapsed and cancelled policies stay in the source
+      and drop out of the count and premium.
+    config:
+      access: public
+      contract:
+        enforced: true
+    columns:
+      - name: insurance_customer_id
+        description: Policy-admin customer key. Matches insurance_customer.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('insurance_customer')
+                field: insurance_customer_id
+      - name: active_policy_count
+        description: Policies currently in force.
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: annual_premium
+        description: Sum of annual premium on in-force policies.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]

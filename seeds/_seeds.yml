@@ -1,0 +1,40 @@
+version: 2
+
+seeds:
+  - name: customers
+    description: Banking customers, including one frozen relationship and one inactive commercial name.
+    config:
+      column_types:
+        banking_customer_id: varchar
+        party_key: varchar
+        customer_status: varchar
+        full_name: varchar
+        loaded_at: timestamp
+    columns:
+      - name: banking_customer_id
+        data_tests: [unique, not_null]
+      - name: party_key
+        data_tests: [unique, not_null]
+  - name: accounts
+    description: Deposit and card accounts. Closed accounts stay in the book but drop out of account_count.
+    config:
+      column_types:
+        account_id: varchar
+        banking_customer_id: varchar
+        account_status: varchar
+        product_name: varchar
+    columns:
+      - name: account_id
+        data_tests: [unique, not_null]
+  - name: loans
+    description: Loan facilities. Harbor Logistics carries a negative outstanding balance on purpose.
+    config:
+      column_types:
+        loan_id: varchar
+        banking_customer_id: varchar
+        loan_status: varchar
+        balance: numeric(18,2)
+        product_name: varchar
+    columns:
+      - name: loan_id
+        data_tests: [unique, not_null]

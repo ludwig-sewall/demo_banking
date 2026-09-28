@@ -1,0 +1,300 @@
+version: 2
+
+models:
+  - name: group_customer
+    description: >
+      Internal party crosswalk. Grain is one row per party_key.
+      A null domain id means that party is not a customer of that book.
+      Two ids in one domain for the same party fail the unique test on party_key.
+    config:
+      access: protected
+    columns:
+      - name: party_key
+        description: Group party key. The only key Customer 360 should publish.
+        data_tests: [unique, not_null]
+      - name: banking_customer_id
+        description: Banking customer for this party, when the party is in the bank book.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('demo_banking', 'banking_customer')
+                field: banking_customer_id
+      - name: insurance_customer_id
+        description: Insurance customer for this party, when the party is in the policy book.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('demo_banking_insurance', 'insurance_customer')
+                field: insurance_customer_id
+      - name: wealth_customer_id
+        description: Wealth client for this party, when the party is in the wealth book.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('demo_banking_wealth', 'wealth_customer')
+                field: wealth_customer_id
+
+  - name: customer_360
+    description: >
+      Public group customer 360. Grain is one row per party.
+      Product measures are null when the party is absent from that domain,
+      and zero when they are a customer with nothing open.
+      profit_12m is trailing-twelve-month profit from customer_profitability,
+      and is null when finance has no complete months for the party.
+    config:
+      access: public
+      contract:
+        enforced: true
+    semantic_model:
+      enabled: true
+    agg_time_dimension: as_of_date
+    columns:
+      - name: party_key
+        description: Group party key.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [unique, not_null]
+        entity:
+          type: primary
+          name: party
+      - name: banking_customer_id
+        description: Banking customer id, null when the party has no bank relationship.
+        data_type: varchar
+      - name: insurance_customer_id
+        description: Insurance customer id, null when the party has no policy relationship.
+        data_type: varchar
+      - name: wealth_customer_id
+        description: Wealth client id, null when the party has no wealth relationship.
+        data_type: varchar
+      - name: account_count
+        description: Open banking accounts. Null when the party is not a banking customer.
+        data_type: integer
+      - name: loan_count
+        description: Outstanding loan facilities. Null when the party is not a banking customer.
+        data_type: integer
+      - name: loan_balance
+        description: Outstanding loan principal. Null when the party is not a banking customer.
+        data_type: number(18,2)
+      - name: active_policy_count
+        description: In-force policies. Null when the party is not an insurance customer.
+        data_type: integer
+      - name: annual_premium
+        description: In-force annual premium. Null when the party is not an insurance customer.
+        data_type: number(18,2)
+      - name: portfolio_count
+        description: Open portfolios. Null when the party is not a wealth client.
+        data_type: integer
+      - name: assets_under_management
+        description: Open portfolio market value. Null when the party is not a wealth client.
+        data_type: number(18,2)
+      - name: profit_12m
+        description: Sum of monthly profit inside the trailing twelve months. Null when no complete month exists.
+        data_type: number(18,2)
+      - name: as_of_date
+        description: Demo reporting date. Every row shares demo_as_of_date.
+        data_type: date
+        constraints: [{type: not_null}]
+        granularity: day
+        dimension:
+          type: time
+    metrics:
+      - name: customers
+        description: Parties on the group customer 360.
+        label: Customers
+        type: simple
+        agg: count
+        expr: "1"
+      - name: trailing_profit
+        description: Sum of trailing-twelve-month profit. Parties with no complete month are skipped.
+        label: Trailing profit
+        type: simple
+        agg: sum
+        expr: profit_12m
+      - name: total_assets_under_management
+        description: Open wealth assets across parties.
+        label: Assets under management
+        type: simple
+        agg: sum
+        expr: assets_under_management
+      - name: total_loan_balance
+        description: Outstanding loan principal across parties.
+        label: Loan balance
+        type: simple
+        agg: sum
+        expr: loan_balance
+      - name: total_annual_premium
+        description: In-force insurance premium across parties.
+        label: Annual premium
+        type: simple
+        agg: sum
+        expr: annual_premium
+      - name: profit_per_customer
+        description: Trailing profit divided by customer count.
+        label: Profit per customer
+        type: derived
+        expr: trailing_profit / customers
+        input_metrics:
+          - name: trailing_profit
+          - name: customers
+      - name: customers_in_loss
+        description: Parties whose trailing profit is below zero.
+        label: Customers in loss
+        type: simple
+        agg: count
+        expr: "1"
+        filter: "{{ Dimension('party__profit_band') }} = 'loss'"
+      - name: full_relationship_customers
+        description: Parties present in banking, insurance, and wealth.
+        label: Full relationship customers
+        type: simple
+        agg: count
+        expr: "1"
+        filter: "{{ Dimension('party__relationship') }} = 'all_three'"
+    derived_semantics:
+      dimensions:
+        - name: relationship
+          type: categorical
+          label: Relationship
+          description: Which books this party is in.
+          expr: >
+            case
+              when banking_customer_id is not null and insurance_customer_id is not null and wealth_customer_id is not null then 'all_three'
+              when banking_customer_id is not null and insurance_customer_id is not null then 'bank_and_insurance'
+              when banking_customer_id is not null and wealth_customer_id is not null then 'bank_and_wealth'
+              when insurance_customer_id is not null and wealth_customer_id is not null then 'insurance_and_wealth'
+              when banking_customer_id is not null then 'banking_only'
+              when insurance_customer_id is not null then 'insurance_only'
+              when wealth_customer_id is not null then 'wealth_only'
+              else 'none'
+            end
+        - name: profit_band
+          type: categorical
+          label: Profit band
+          description: Trailing-twelve-month profit bucket.
+          expr: >
+            case
+              when profit_12m is null then 'unknown'
+              when profit_12m < 0 then 'loss'
+              when profit_12m < 1000 then 'thin'
+              else 'healthy'
+            end
+
+  - name: next_best_action
+    description: >
+      One recommended action per party. The published value is todo until
+      the case branches in the model are uncommented.
+    config:
+      access: public
+      contract:
+        enforced: true
+    semantic_model:
+      enabled: true
+    columns:
+      - name: party_key
+        description: Group party key. One action per party.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        entity:
+          type: primary
+          name: party
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('customer_360')
+                field: party_key
+      - name: recommended_action
+        description: Action to take for this party. todo means the exercise is still open.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        dimension:
+          type: categorical
+        data_tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              arguments:
+                values: [restructure_credit, offer_insurance, offer_wealth, priority_review, retain]
+      - name: as_of_date
+        description: Demo reporting date. Matches customer_360.
+        data_type: date
+        constraints: [{type: not_null}]
+
+  - name: customer_profit_month
+    description: >
+      Monthly profit for each party, from financials. One row per party and month
+      that has both revenue and cost. This is the time series under the snapshot.
+    config:
+      access: protected
+    semantic_model:
+      enabled: true
+    agg_time_dimension: profit_month
+    columns:
+      - name: party_key
+        description: Group party key.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        entity:
+          type: primary
+          name: party
+      - name: profit_month
+        description: First day of the profit month.
+        data_type: date
+        constraints: [{type: not_null}]
+        granularity: month
+        dimension:
+          type: time
+      - name: revenue
+        description: Priced revenue for the month.
+        data_type: number(18,2)
+      - name: cost
+        description: Allocated cost for the month.
+        data_type: number(18,2)
+      - name: profit
+        description: Revenue minus cost.
+        data_type: number(18,2)
+    metrics:
+      - name: monthly_profit
+        description: Profit in the month.
+        label: Monthly profit
+        type: simple
+        agg: sum
+        expr: profit
+      - name: monthly_revenue
+        description: Revenue in the month.
+        label: Monthly revenue
+        type: simple
+        agg: sum
+        expr: revenue
+      - name: monthly_cost
+        description: Allocated cost in the month.
+        label: Monthly cost
+        type: simple
+        agg: sum
+        expr: cost
+
+  - name: time_spine_daily
+    description: One reporting date for the demo, used by the customer_360 semantic model.
+    config:
+      access: protected
+    time_spine:
+      standard_granularity_column: date_day
+    columns:
+      - name: date_day
+        description: Demo as-of date.
+        data_type: date
+        granularity: day
+        data_tests: [unique, not_null]
+
+exposures:
+  - name: group_customer_360
+    label: Group customer 360
+    type: dashboard
+    owner:
+      name: Retail and wealth
+      email: customer360@example.com
+    depends_on:
+      - ref('customer_360')
+    description: Cross-domain holdings and trailing profit for each party.

@@ -1,0 +1,23 @@
+name: "demo_banking_customer_360"
+version: "1.0.0"
+config-version: 2
+profile: "demo_banking_customer_360"
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  demo_as_of_date: "2026-03-31"
+
+models:
+  demo_banking_customer_360:
+    +materialized: view
+    marts:
+      +schema: marts
+      +access: private
+      +materialized: table

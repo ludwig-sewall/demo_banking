@@ -1,0 +1,12 @@
+policy_id,insurance_customer_id,policy_status,annual_premium,product_name
+POL-01,I-1001,active,2800.00,home
+POL-02,I-1001,active,2000.00,life
+POL-03,I-1002,lapsed,900.00,auto
+POL-04,I-1003,active,6400.00,life
+POL-05,I-1003,active,4200.00,home
+POL-06,I-1003,active,1800.00,umbrella
+POL-07,I-1005,cancelled,1100.00,auto
+POL-08,I-1006,active,1560.00,auto
+POL-09,I-1007,active,14000.00,commercial_property
+POL-10,I-1007,active,8000.00,key_person
+POL-11,I-1009,active,3200.00,home

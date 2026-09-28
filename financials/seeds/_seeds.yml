@@ -1,0 +1,29 @@
+version: 2
+
+seeds:
+  - name: revenue_transactions
+    description: >
+      Revenue postings from October 2025 through March 2026.
+      Noah Keller has an unpriced February posting. Marcus Okonkwo has a March outlier.
+    config:
+      column_types:
+        transaction_id: varchar
+        party_key: varchar
+        month: date
+        amount: numeric(18,2)
+        loaded_at: timestamp
+    columns:
+      - name: transaction_id
+        data_tests: [unique, not_null]
+  - name: allocated_costs
+    description: >
+      Monthly cost allocations. Amira Haddad is missing January and February.
+    config:
+      column_types:
+        allocation_id: varchar
+        party_key: varchar
+        month: date
+        cost: numeric(18,2)
+    columns:
+      - name: allocation_id
+        data_tests: [unique, not_null]

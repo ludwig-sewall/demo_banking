@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: insurance
+    description: Policy admin book. Customers are keyed to the group party, separate from the banking customer id.
+    schema: "{{ target.schema }}_insurance_seeds"
+    tables:
+      - name: customers
+        description: One row per insurance customer.
+        config:
+          loaded_at_field: loaded_at
+          freshness:
+            warn_after: {count: 100000, period: hour}
+      - name: policies
+        description: One row per policy. Only active policies count toward holdings and premium.

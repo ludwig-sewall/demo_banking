@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: customer_revenue
+    description: >
+      Internal monthly revenue at party grain. Built by summing revenue
+      postings. A null total means every posting that month failed to price.
+    config:
+      access: protected
+    columns:
+      - name: party_key
+        description: Group party key. Not a banking customer id.
+        data_type: varchar
+        data_tests: [not_null]
+      - name: month
+        description: First day of the revenue month.
+        data_type: date
+        data_tests: [not_null]
+      - name: revenue
+        description: Sum of postings. Null when the month has no priced amount.
+
+  - name: customer_cost
+    description: >
+      Internal monthly allocated cost at party grain. A null cost means
+      finance has no allocation for that party-month yet.
+    config:
+      access: protected
+    columns:
+      - name: party_key
+        description: Group party key.
+        data_type: varchar
+        data_tests: [not_null]
+      - name: month
+        description: First day of the allocation month.
+        data_type: date
+        data_tests: [not_null]
+      - name: cost
+        description: Allocated cost. Null when the allocation is missing.
+
+  - name: customer_profitability
+    description: >
+      Public monthly profit. Grain is party and month, and only months
+      with both a priced revenue total and an allocated cost are included.
+      Profit is revenue minus cost.
+    config:
+      access: public
+      contract:
+        enforced: true
+    columns:
+      - name: party_key
+        description: Group party key.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [not_null]
+      - name: month
+        description: First day of the month.
+        data_type: date
+        constraints: [{type: not_null}]
+        data_tests: [not_null]
+      - name: revenue
+        description: Priced revenue for the month.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+        data_tests: [not_null]
+      - name: cost
+        description: Allocated cost for the month.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+        data_tests: [not_null]
+      - name: profit
+        description: Revenue minus cost for the same party-month.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+        data_tests: [not_null]

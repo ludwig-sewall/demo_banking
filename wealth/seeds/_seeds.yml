@@ -1,0 +1,29 @@
+version: 2
+
+seeds:
+  - name: clients
+    description: Wealth clients, including a small starter book with no financial allocation.
+    config:
+      column_types:
+        client_id: varchar
+        party_key: varchar
+        client_status: varchar
+        full_name: varchar
+        loaded_at: timestamp
+    columns:
+      - name: client_id
+        data_tests: [unique, not_null]
+      - name: party_key
+        data_tests: [unique, not_null]
+  - name: portfolios
+    description: Open and closed portfolios. Market value on open rows is assets under management.
+    config:
+      column_types:
+        portfolio_id: varchar
+        client_id: varchar
+        portfolio_status: varchar
+        market_value: numeric(18,2)
+        portfolio_name: varchar
+    columns:
+      - name: portfolio_id
+        data_tests: [unique, not_null]

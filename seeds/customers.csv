@@ -1,0 +1,9 @@
+banking_customer_id,party_key,customer_status,full_name,loaded_at
+B-1001,P-1001,active,Elena Voss,2026-03-31 00:00:00
+B-1002,P-1002,active,Jonas Berg,2026-03-31 00:00:00
+B-1004,P-1004,active,Marcus Okonkwo,2026-03-31 00:00:00
+B-1005,P-1005,closed,Sofia Lind,2026-03-31 00:00:00
+B-1006,P-1006,active,Chen Wei,2026-03-31 00:00:00
+B-1008,P-1008,active,Noah Keller,2026-03-31 00:00:00
+B-1009,P-1009,frozen,Priya Shah,2026-03-31 00:00:00
+B-1010,P-1010,inactive,Harbor Logistics,2026-03-31 00:00:00

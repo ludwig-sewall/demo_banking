@@ -1,0 +1,29 @@
+version: 2
+
+seeds:
+  - name: customers
+    description: Insurance customers. Jonas Berg is inactive with a lapsed auto policy.
+    config:
+      column_types:
+        insurance_customer_id: varchar
+        party_key: varchar
+        customer_status: varchar
+        full_name: varchar
+        loaded_at: timestamp
+    columns:
+      - name: insurance_customer_id
+        data_tests: [unique, not_null]
+      - name: party_key
+        data_tests: [unique, not_null]
+  - name: policies
+    description: Policies across home, life, auto, and commercial cover. Only active rows roll into the public model.
+    config:
+      column_types:
+        policy_id: varchar
+        insurance_customer_id: varchar
+        policy_status: varchar
+        annual_premium: numeric(18,2)
+        product_name: varchar
+    columns:
+      - name: policy_id
+        data_tests: [unique, not_null]

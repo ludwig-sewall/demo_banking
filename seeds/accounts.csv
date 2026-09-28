@@ -1,0 +1,16 @@
+account_id,banking_customer_id,account_status,product_name
+A-01,B-1001,open,checking
+A-02,B-1001,open,savings
+A-03,B-1002,open,checking
+A-04,B-1002,open,savings
+A-05,B-1002,open,credit_card
+A-06,B-1002,closed,checking
+A-07,B-1004,open,private_checking
+A-08,B-1005,closed,checking
+A-09,B-1006,open,checking
+A-10,B-1006,open,savings
+A-11,B-1008,open,checking
+A-12,B-1009,open,checking
+A-13,B-1009,open,savings
+A-14,B-1010,open,operating
+A-15,B-1010,open,checking

@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: banking
+    description: Core banking book. One customer can hold deposit accounts and loan facilities.
+    schema: "{{ target.schema }}_banking_seeds"
+    tables:
+      - name: customers
+        description: One row per banking customer. party_key is the group identifier shared with insurance and wealth.
+        config:
+          loaded_at_field: loaded_at
+          freshness:
+            warn_after: {count: 100000, period: hour}
+      - name: accounts
+        description: One row per deposit or card account. Open rows count toward account_count.
+      - name: loans
+        description: One row per loan facility. Outstanding balance can be wrong-signed when the source feed is defective.

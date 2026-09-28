@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: wealth
+    description: Wealth client book. Client ids are not banking or insurance customer ids.
+    schema: "{{ target.schema }}_wealth_seeds"
+    tables:
+      - name: clients
+        description: One row per wealth client.
+        config:
+          loaded_at_field: loaded_at
+          freshness:
+            warn_after: {count: 100000, period: hour}
+      - name: portfolios
+        description: One row per portfolio. Open market value rolls into assets under management.

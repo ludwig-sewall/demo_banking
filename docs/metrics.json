@@ -1,0 +1,62 @@
+{
+  "project": "demo_banking_customer_360",
+  "title": "Customer 360 metrics",
+  "suggested": [
+    "How many customers do we have?",
+    "What is trailing profit by relationship?",
+    "Show profit by recommended action",
+    "Monthly profit, revenue, and cost"
+  ],
+  "metrics": [
+    {"name": "customers", "label": "Customers", "description": "Parties on the group customer 360."},
+    {"name": "trailing_profit", "label": "Trailing profit", "description": "Sum of trailing-twelve-month profit."},
+    {"name": "total_assets_under_management", "label": "Assets under management", "description": "Open wealth assets across parties."},
+    {"name": "total_loan_balance", "label": "Loan balance", "description": "Outstanding loan principal across parties."},
+    {"name": "total_annual_premium", "label": "Annual premium", "description": "In-force insurance premium across parties."},
+    {"name": "profit_per_customer", "label": "Profit per customer", "description": "Trailing profit divided by customers."},
+    {"name": "customers_in_loss", "label": "Customers in loss", "description": "Parties with negative trailing profit."},
+    {"name": "full_relationship_customers", "label": "Full relationship customers", "description": "Parties present in banking, insurance, and wealth."},
+    {"name": "monthly_profit", "label": "Monthly profit", "description": "Profit by calendar month."},
+    {"name": "monthly_revenue", "label": "Monthly revenue", "description": "Revenue by calendar month."},
+    {"name": "monthly_cost", "label": "Monthly cost", "description": "Allocated cost by calendar month."}
+  ],
+  "dimensions": [
+    {"name": "party__relationship", "label": "Relationship"},
+    {"name": "party__profit_band", "label": "Profit band"},
+    {"name": "party__recommended_action", "label": "Recommended action"},
+    {"name": "metric_time__month", "label": "Month"}
+  ],
+  "intents": [
+    {
+      "match": ["how many customer", "customer count", "number of customer"],
+      "metrics": ["customers"]
+    },
+    {
+      "match": ["trailing profit", "profit by relationship", "profit relationship"],
+      "metrics": ["customers", "trailing_profit"],
+      "groupBy": ["party__relationship", "party__profit_band"]
+    },
+    {
+      "match": ["recommended action", "next best", "nba"],
+      "metrics": ["customers", "trailing_profit"],
+      "groupBy": ["party__recommended_action"]
+    },
+    {
+      "match": ["monthly", "by month", "revenue and cost"],
+      "metrics": ["monthly_profit", "monthly_revenue", "monthly_cost"],
+      "groupBy": ["metric_time__month"]
+    },
+    {
+      "match": ["aum", "assets under management", "wealth"],
+      "metrics": ["total_assets_under_management", "customers"]
+    },
+    {
+      "match": ["loan", "lending"],
+      "metrics": ["total_loan_balance", "customers"]
+    },
+    {
+      "match": ["premium", "insurance"],
+      "metrics": ["total_annual_premium", "customers"]
+    }
+  ]
+}

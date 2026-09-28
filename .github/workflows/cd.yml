@@ -1,0 +1,13 @@
+name: cd
+
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  naming:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Naming convention
+        run: python3 scripts/check_naming.py

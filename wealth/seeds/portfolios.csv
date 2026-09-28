@@ -1,0 +1,10 @@
+portfolio_id,client_id,portfolio_status,market_value,portfolio_name
+PF-01,W-1001,open,1200000.00,managed_equity
+PF-02,W-1001,open,600000.00,fixed_income
+PF-03,W-1004,open,4100000.00,global_equity
+PF-04,W-1004,open,1800000.00,private_credit
+PF-05,W-1004,open,500000.00,cash_reserve
+PF-06,W-1005,closed,0.00,advisory
+PF-07,W-1007,open,3100000.00,family_office
+PF-08,W-1009,open,240000.00,retirement
+PF-09,W-1011,open,85000.00,starter_isa
