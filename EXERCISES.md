@@ -30,7 +30,7 @@ The Banking project (`demo_banking`) is already built in Production. Create a fe
 5. In `seeds/customers.csv`, change the status to `active`, `inactive`, or `closed`.
 6. Build `customers` and `banking_customer` using the interface icons or run:
    ```bash
-   dbt build --select customers banking_customer
+   dbt build --select customers banking_customer --exclude banking_products
    ```
 7. Check the test result and preview the corrected row.
 
@@ -77,7 +77,11 @@ The Banking project (`demo_banking`) is already built in Production. Create a fe
    {{ anonymize('full_name') }} as full_name_hash,
    ```
 3. Add both columns to the enforced contract in `models/marts/_marts.yml` with `data_type: varchar`.
-4. Click Build on `banking_customer` or run `dbt build --select banking_customer`. Click Preview to compare the two columns.
+4. Click Build on `banking_customer` or run:
+   ```bash
+   dbt build --select customers banking_customer --exclude banking_products
+   ```
+   Click Preview to compare the two columns.
 
 **Finish when:** The build passes and `full_name_hash` contains a digest rather than the clear name.
 
