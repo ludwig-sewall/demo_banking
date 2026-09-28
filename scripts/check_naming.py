@@ -45,8 +45,11 @@ def check_model(project: str, name: str) -> str | None:
             break
     if not _snake(name):
         return f"{project or 'banking'}: {name} is not snake_case"
+    # Personal NBA models: <name>_next_best_action
+    if project == "customer_360" and name.endswith("_next_best_action") and name != "next_best_action":
+        return None
     if allowed is not None and name not in allowed:
-        return f"{project}: {name} must be one of {', '.join(sorted(allowed))}"
+        return f"{project}: {name} must be one of {', '.join(sorted(allowed))} (or <you>_next_best_action)"
     if prefix and not name.startswith(prefix):
         label = project or "banking"
         return f"{label}: {name} must start with {prefix}"
