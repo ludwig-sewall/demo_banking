@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>demo_banking · Metric chat</title>
+  <title>op_banking · Metric chat</title>
   <style>
     :root {
       --bg0: #0f1419;
@@ -152,7 +152,7 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>demo_banking</h1>
+      <h1>op_banking</h1>
       <p>
         Ask the Customer 360 semantic model. With a dbt Semantic Layer token this page
         runs live metric queries; without one it still routes questions to the metric catalog.
@@ -187,13 +187,13 @@
       </div>
       <p class="hint">
         Create a dbt Cloud service token with Semantic Layer permissions for the
-        <code>demo_banking_customer_360</code> production environment. Tokens never leave your browser except to the GraphQL host you set.
+        <code>op_customer_360</code> production environment. Tokens never leave your browser except to the GraphQL host you set.
       </p>
     </details>
   </div>
 
   <script>
-    const STORAGE = "demo_banking_sl_v1";
+    const STORAGE = "op_banking_sl_v1";
     const chat = document.getElementById("chat");
     const form = document.getElementById("form");
     const q = document.getElementById("q");
