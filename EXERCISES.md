@@ -84,7 +84,7 @@ When several domains publish customer data, shared macros help them apply the sa
 
 1. Open Catalog → Production → account lineage. Find `customer_360` and confirm its parents come from the four domain projects.
 2. Open `op_customer_360` → Develop → Studio IDE. Preview `customer_360`.
-3. Pick one `customer_id` (`party_key`) and note which domains it appears in (`banking_customer_id`, `insurance_customer_id`, `wealth_customer_id`, `domain_count`) and its trailing profit.
+3. Pick one `customer_id` (`party_key`) and note which domains it appears in (`banking_customer_id`, `insurance_customer_id`, `wealth_customer_id`, `domain_count`) and its total profit.
 4. Optional: add a simple derived column (for example a `case` on `domain_count` or `loan_balance`) directly in `models/marts/customer_360.sql`, update the contract in `_marts.yml`, then Build and Preview.
 
 **Done when:** You can explain how one party row is assembled from cross-project `ref()`s.
