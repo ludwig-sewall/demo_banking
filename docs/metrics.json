@@ -1,0 +1,51 @@
+{
+  "project": "op_customer_360",
+  "title": "Customer 360 metrics",
+  "suggested": [
+    "How many customers do we have?",
+    "Customers and profit by banking status",
+    "Total revenue by insurance status",
+    "AUM by wealth status",
+    "Total profit"
+  ],
+  "metrics": [
+    {"name": "customers", "label": "Customers", "description": "Parties on the customer 360."},
+    {"name": "total_revenue", "label": "Total revenue", "description": "Sum of revenue from financials."},
+    {"name": "total_profit", "label": "Total profit", "description": "Sum of profit from financials."},
+    {"name": "assets_under_management", "label": "AUM", "description": "Sum of open portfolio market value."}
+  ],
+  "dimensions": [
+    {"name": "customer__banking_status", "label": "Banking status"},
+    {"name": "customer__insurance_status", "label": "Insurance status"},
+    {"name": "customer__wealth_status", "label": "Wealth status"}
+  ],
+  "intents": [
+    {
+      "match": ["how many customer", "customer count", "number of customer", "how many parties"],
+      "metrics": ["customers"]
+    },
+    {
+      "match": ["profit by banking", "customers and profit", "banking status"],
+      "metrics": ["customers", "total_profit"],
+      "groupBy": ["customer__banking_status"]
+    },
+    {
+      "match": ["revenue by insurance", "insurance status", "total revenue"],
+      "metrics": ["customers", "total_revenue"],
+      "groupBy": ["customer__insurance_status"]
+    },
+    {
+      "match": ["aum", "assets under management", "wealth status"],
+      "metrics": ["assets_under_management", "customers"],
+      "groupBy": ["customer__wealth_status"]
+    },
+    {
+      "match": ["total profit", "profit"],
+      "metrics": ["total_profit", "customers"]
+    },
+    {
+      "match": ["revenue"],
+      "metrics": ["total_revenue", "customers"]
+    }
+  ]
+}
