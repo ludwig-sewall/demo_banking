@@ -1,7 +1,7 @@
-name: "demo_banking_financials"
+name: "op_financials"
 version: "1.0.0"
 config-version: 2
-profile: "demo_banking_financials"
+profile: "op_financials"
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
@@ -17,7 +17,7 @@ vars:
   profit_floor_warn: 0
 
 models:
-  demo_banking_financials:
+  op_financials:
     +materialized: view
     marts:
       +schema: marts
@@ -25,5 +25,5 @@ models:
       +materialized: table
 
 seeds:
-  demo_banking_financials:
+  op_financials:
     +schema: financials_seeds
