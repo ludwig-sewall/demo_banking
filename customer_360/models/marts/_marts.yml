@@ -3,244 +3,94 @@ version: 2
 models:
   - name: customer_360
     description: >
-      Public customer 360 feature table. One row per customer with domain
-      revenue, payment and claims signals, service notes, and current interest.
-      customer_id_hash is produced with the shared anonymize macro.
-      Built for a later customer_segmentation_model on the same grain.
+      Public group customer 360. One row per party_key, built only from
+      cross-project refs to banking, insurance, wealth, and financials.
+      customer_id_hash uses the shared anonymize macro.
     config:
       access: public
       contract:
         enforced: true
-    semantic_model:
-      enabled: true
-    agg_time_dimension: as_of_date
     columns:
       - name: customer_id
-        description: Clear demo customer id (C001…).
+        description: Group party key (P-…).
         data_type: varchar
         constraints: [{type: not_null}]
         data_tests: [unique, not_null]
-        entity:
-          type: primary
-          name: customer
       - name: customer_id_hash
-        description: Anonymized customer id (sha2 / md5 via anonymize macro).
+        description: Anonymized party key via anonymize macro.
         data_type: varchar
         constraints: [{type: not_null}]
         data_tests: [unique, not_null]
-      - name: banking_revenue_eur
-        description: Trailing banking revenue in EUR.
-        data_type: number(18,2)
-        constraints: [{type: not_null}]
-      - name: wealth_revenue_eur
-        description: Trailing wealth revenue in EUR.
-        data_type: number(18,2)
-        constraints: [{type: not_null}]
-      - name: insurance_revenue_eur
-        description: Trailing insurance revenue in EUR.
-        data_type: number(18,2)
-        constraints: [{type: not_null}]
-      - name: total_revenue_eur
-        description: Sum of banking, wealth, and insurance revenue.
-        data_type: number(18,2)
-        constraints: [{type: not_null}]
-      - name: monthly_avg_revenue_eur
-        description: total_revenue_eur / 12.
-        data_type: number(18,2)
-        constraints: [{type: not_null}]
-      - name: banking_missed_payments
-        description: Count of missed banking payments in the trailing window.
+      - name: banking_customer_id
+        description: Banking customer id when the party is in banking.
+        data_type: varchar
+      - name: banking_status
+        description: Banking relationship status.
+        data_type: varchar
+      - name: account_count
+        description: Open banking accounts.
         data_type: integer
         constraints: [{type: not_null}]
-      - name: banking_payment_remark
-        description: Yes when payments are under formal remark / watch.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        dimension:
-          type: categorical
-      - name: insurance_claims
-        description: Insurance claims opened in the trailing window.
+      - name: loan_count
+        description: Outstanding loans.
         data_type: integer
         constraints: [{type: not_null}]
-      - name: insurance_successful_claims
-        description: Claims paid or approved.
+      - name: loan_balance
+        description: Sum of outstanding loan principal.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: insurance_customer_id
+        description: Insurance customer id when the party is in insurance.
+        data_type: varchar
+      - name: insurance_status
+        description: Insurance relationship status.
+        data_type: varchar
+      - name: active_policy_count
+        description: In-force insurance policies.
         data_type: integer
         constraints: [{type: not_null}]
-      - name: customer_service_notes
-        description: Free-text service context across domains (pipe-separated).
-        data_type: varchar
+      - name: annual_premium
+        description: Sum of in-force annual premium.
+        data_type: number(18,2)
         constraints: [{type: not_null}]
-      - name: current_interest
-        description: Current commercial interest / opportunity theme.
+      - name: wealth_customer_id
+        description: Wealth client id when the party is in wealth.
         data_type: varchar
+      - name: wealth_status
+        description: Wealth relationship status.
+        data_type: varchar
+      - name: portfolio_count
+        description: Open wealth portfolios.
+        data_type: integer
         constraints: [{type: not_null}]
-        dimension:
-          type: categorical
+      - name: assets_under_management
+        description: Sum of open portfolio market value.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: trailing_revenue
+        description: Trailing 12-month revenue from financials.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: trailing_cost
+        description: Trailing 12-month cost from financials.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: trailing_profit
+        description: Trailing 12-month profit from financials.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: profit_months
+        description: Months with both priced revenue and allocated cost.
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: domain_count
+        description: How many of banking / insurance / wealth the party appears in.
+        data_type: integer
+        constraints: [{type: not_null}]
       - name: as_of_date
         description: Demo reporting date (demo_as_of_date).
         data_type: date
         constraints: [{type: not_null}]
-        granularity: day
-        dimension:
-          type: time
-    metrics:
-      - name: customers
-        description: Customers on the 360.
-        label: Customers
-        type: simple
-        agg: count
-        expr: "1"
-      - name: total_revenue
-        description: Sum of total_revenue_eur.
-        label: Total revenue
-        type: simple
-        agg: sum
-        expr: total_revenue_eur
-      - name: avg_monthly_revenue
-        description: Sum of monthly_avg_revenue_eur.
-        label: Monthly avg revenue
-        type: simple
-        agg: sum
-        expr: monthly_avg_revenue_eur
-      - name: missed_payments
-        description: Sum of banking missed payments.
-        label: Missed payments
-        type: simple
-        agg: sum
-        expr: banking_missed_payments
-      - name: open_claims
-        description: Sum of insurance claims opened.
-        label: Insurance claims
-        type: simple
-        agg: sum
-        expr: insurance_claims
-
-  - name: demo_customer_segmentation
-    description: >
-      Example customer segmentation with segment and recommended_action.
-      Workshop participants copy this pattern to
-      <developer>_customer_segmentation_model.
-    config:
-      access: public
-      contract:
-        enforced: true
-    semantic_model:
-      enabled: false
-    columns:
-      - name: customer_id
-        description: Customer id from customer_360.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        data_tests:
-          - unique
-          - not_null
-          - relationships:
-              arguments:
-                to: ref('customer_360')
-                field: customer_id
-      - name: segment
-        description: Segment label produced by the demo rules.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        data_tests: [not_null]
-      - name: recommended_action
-        description: Next best action for this customer in the segment.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        data_tests: [not_null]
-      - name: as_of_date
-        description: Demo reporting date. Matches customer_360.
-        data_type: date
-        constraints: [{type: not_null}]
-
-  - name: customer_segmentation_model
-    description: >
-      Optional union of published segmentation models (starts with
-      demo_customer_segmentation). Workshop exercise 6 builds a separate
-      <developer>_customer_segmentation_model.
-    config:
-      access: public
-      contract:
-        enforced: true
-    semantic_model:
-      enabled: false
-    columns:
-      - name: customer_id
-        description: Customer id from a published segmentation model.
-        data_type: varchar
-        constraints: [{type: not_null}]
-      - name: segment
-        description: Segment label from the authoring model.
-        data_type: varchar
-        constraints: [{type: not_null}]
-      - name: recommended_action
-        description: Recommended action from the authoring model.
-        data_type: varchar
-        constraints: [{type: not_null}]
-      - name: author
-        description: Source model name (e.g. demo_customer_segmentation).
-        data_type: varchar
-        constraints: [{type: not_null}]
-      - name: as_of_date
-        description: Demo reporting date.
-        data_type: date
-        constraints: [{type: not_null}]
-
-  - name: mesh_lineage_anchors
-    description: >
-      Cross-project count anchors so Account Lineage includes banking,
-      insurance, wealth, and financials beside customer_360.
-    config:
-      access: protected
-    columns:
-      - name: domain
-        description: Mesh domain label.
-        data_type: varchar
-        constraints: [{type: not_null}]
-      - name: customers
-        description: Row count from the upstream public model.
-        data_type: integer
-        constraints: [{type: not_null}]
-
-  - name: customer_profit_month
-    description: >
-      Monthly profit for each party from financials. Kept for mesh lineage;
-      not exposed as a semantic model.
-    config:
-      access: protected
-    semantic_model:
-      enabled: false
-    columns:
-      - name: party_key
-        description: Group party key.
-        data_type: varchar
-        constraints: [{type: not_null}]
-      - name: profit_month
-        description: First day of the profit month.
-        data_type: date
-        constraints: [{type: not_null}]
-      - name: revenue
-        description: Priced revenue for the month.
-        data_type: number(18,2)
-      - name: cost
-        description: Allocated cost for the month.
-        data_type: number(18,2)
-      - name: profit
-        description: Revenue minus cost.
-        data_type: number(18,2)
-
-  - name: time_spine_daily
-    description: One reporting date for the demo, used by the customer_360 semantic model.
-    config:
-      access: protected
-    time_spine:
-      standard_granularity_column: date_day
-    columns:
-      - name: date_day
-        description: Demo as-of date.
-        data_type: date
-        granularity: day
-        data_tests: [unique, not_null]
 
 exposures:
   - name: customer_360_dashboard
@@ -251,5 +101,4 @@ exposures:
       email: customer360@example.com
     depends_on:
       - ref('customer_360')
-      - ref('customer_segmentation_model')
-    description: Customer feature table and published segmentations.
+    description: Mesh-fed customer 360 feature table.
