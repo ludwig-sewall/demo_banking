@@ -1,5 +1,3 @@
--- depends_on: {{ ref('accounts') }}
--- depends_on: {{ ref('loans') }}
 with open_accounts as (
   select
     banking_customer_id,
