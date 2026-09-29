@@ -11,8 +11,6 @@ snapshot-paths: ["snapshots"]
 
 clean-targets: ["target", "dbt_packages"]
 
-vars:
-  demo_as_of_date: "2026-03-31"
   revenue_outlier_warn: 50000
   profit_floor_warn: 0
 
