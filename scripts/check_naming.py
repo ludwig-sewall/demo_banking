@@ -17,7 +17,7 @@ PROJECTS: tuple[tuple[str, str | None, frozenset[str] | None], ...] = (
     (
         "customer_360",
         None,
-        frozenset({"customer_360"}),
+        frozenset({"customer_360", "time_spine_daily"}),
     ),
 )
 
