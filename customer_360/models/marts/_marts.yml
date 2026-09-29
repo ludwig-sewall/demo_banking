@@ -1,39 +1,6 @@
 version: 2
 
 models:
-  - name: group_customer
-    description: >
-      Internal party crosswalk. Grain is one row per party_key.
-      A null domain id means that party is not a customer of that book.
-      Two ids in one domain for the same party fail the unique test on party_key.
-    config:
-      access: protected
-    columns:
-      - name: party_key
-        description: Group party key. The only key Customer 360 should publish.
-        data_tests: [unique, not_null]
-      - name: banking_customer_id
-        description: Banking customer for this party, when the party is in the bank book.
-        data_tests:
-          - relationships:
-              arguments:
-                to: ref('demo_banking', 'banking_customer')
-                field: banking_customer_id
-      - name: insurance_customer_id
-        description: Insurance customer for this party, when the party is in the policy book.
-        data_tests:
-          - relationships:
-              arguments:
-                to: ref('demo_banking_insurance', 'insurance_customer')
-                field: insurance_customer_id
-      - name: wealth_customer_id
-        description: Wealth client for this party, when the party is in the wealth book.
-        data_tests:
-          - relationships:
-              arguments:
-                to: ref('demo_banking_wealth', 'wealth_customer')
-                field: wealth_customer_id
-
   - name: customer_360
     description: >
       Public group customer 360. Grain is one row per party.
@@ -60,12 +27,57 @@ models:
       - name: banking_customer_id
         description: Banking customer id, null when the party has no bank relationship.
         data_type: varchar
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('op_banking', 'banking_customer')
+                field: banking_customer_id
       - name: insurance_customer_id
         description: Insurance customer id, null when the party has no policy relationship.
         data_type: varchar
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('op_insurance', 'insurance_customer')
+                field: insurance_customer_id
       - name: wealth_customer_id
         description: Wealth client id, null when the party has no wealth relationship.
         data_type: varchar
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('op_wealth', 'wealth_customer')
+                field: wealth_customer_id
+      - name: segment
+        description: Party segment for portfolio slicing.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        dimension:
+          type: categorical
+      - name: region
+        description: Party region.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        dimension:
+          type: categorical
+      - name: channel
+        description: Primary servicing channel.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        dimension:
+          type: categorical
+      - name: lifecycle
+        description: Relationship lifecycle stage.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        dimension:
+          type: categorical
+      - name: value_tier
+        description: Value tier for the party.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        dimension:
+          type: categorical
       - name: account_count
         description: Open banking accounts. Null when the party is not a banking customer.
         data_type: integer
@@ -289,8 +301,8 @@ models:
         data_tests: [unique, not_null]
 
 exposures:
-  - name: group_customer_360
-    label: Group customer 360
+  - name: customer_360_dashboard
+    label: Customer 360
     type: dashboard
     owner:
       name: Retail and wealth
