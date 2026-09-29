@@ -22,6 +22,7 @@ PROJECTS: tuple[tuple[str, str | None, frozenset[str] | None], ...] = (
                 "customer_360",
                 "time_spine_daily",
                 "customer_profit_month",
+                "demo_customer_segmentation",
                 "customer_segmentation_model",
                 "mesh_lineage_anchors",
             }
@@ -45,13 +46,13 @@ def check_model(project: str, name: str) -> str | None:
             break
     if not _snake(name):
         return f"{project or 'banking'}: {name} is not snake_case"
-    # Personal workshop models: <name>_customer_segmentation
-    if project == "customer_360" and name.endswith("_customer_segmentation"):
+    # Personal workshop models: <name>_customer_segmentation_model
+    if project == "customer_360" and name.endswith("_customer_segmentation_model"):
         return None
     if allowed is not None and name not in allowed:
         return (
             f"{project}: {name} must be one of {', '.join(sorted(allowed))} "
-            f"(or <you>_customer_segmentation)"
+            f"(or <you>_customer_segmentation_model)"
         )
     if prefix and not name.startswith(prefix):
         label = project or "banking"
