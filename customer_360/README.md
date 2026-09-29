@@ -47,4 +47,4 @@ Semantic layer is intentionally thin: a few revenue / risk metrics and `current_
 
 ## Exercises
 
-See [EXERCISES.md](../EXERCISES.md). Complete `next_best_action` from the 360 feature columns.
+See [EXERCISES.md](../EXERCISES.md). Publish `<you>_customer_segmentation` (segment + recommended_action) and union it into `customer_segmentation_model`.
