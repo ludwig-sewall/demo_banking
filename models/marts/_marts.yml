@@ -36,7 +36,7 @@ models:
               config:
                 severity: warn
               arguments:
-                values: [active, inactive, closed]
+                values: [active, inactive, closed, frozen]
 
   - name: banking_products
     description: >
