@@ -1,21 +1,33 @@
--- Union of published *_customer_segmentation models.
--- Start with the demo model. Workshop participants add another `union all`
--- branch that refs their <name>_customer_segmentation model.
+{# Union every published <name>_customer_segmentation model in this project. #}
+{% set segment_models = [] %}
+{% for node in graph.nodes.values() %}
+  {% if node.resource_type == 'model'
+      and node.name.endswith('_customer_segmentation')
+      and node.package_name == project_name %}
+    {% do segment_models.append(node.name) %}
+  {% endif %}
+{% endfor %}
+{% set segment_models = segment_models | sort %}
 
+{% if segment_models | length == 0 %}
+select
+  cast(null as varchar) as customer_id,
+  cast(null as varchar) as segment,
+  cast(null as varchar) as recommended_action,
+  cast(null as varchar) as author,
+  cast(null as date) as as_of_date
+where 1 = 0
+{% else %}
+  {% for model_name in segment_models %}
 select
   customer_id::varchar as customer_id,
   segment::varchar as segment,
   recommended_action::varchar as recommended_action,
-  'demo_customer_segmentation'::varchar as author,
+  '{{ model_name }}'::varchar as author,
   as_of_date::date as as_of_date
-from {{ ref('demo_customer_segmentation') }}
-
--- Example after you publish your own model:
--- union all
--- select
---   customer_id::varchar as customer_id,
---   segment::varchar as segment,
---   recommended_action::varchar as recommended_action,
---   'yourname_customer_segmentation'::varchar as author,
---   as_of_date::date as as_of_date
--- from {{ ref('yourname_customer_segmentation') }}
+from {{ ref(model_name) }}
+    {% if not loop.last %}
+union all
+    {% endif %}
+  {% endfor %}
+{% endif %}
