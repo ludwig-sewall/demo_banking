@@ -6,12 +6,16 @@ Feature table for group customers: domain revenue, payment and claims signals, s
 |---|---|---|
 | `customer_360` | public, contracted, semantic model | customer |
 | `next_best_action` | public, contracted | customer |
+| `demo_customer_segmentation` | public, contracted | customer |
+| `customer_segmentation_model` | public, contracted | customer + author |
 | `customer_profit_month` | protected | party + month (mesh lineage) |
 | `time_spine_daily` | protected | day |
 
 `customer_360` is seeded from `customer_book` and hashes `customer_id` with the shared `anonymize` package (`customer_id_hash`). Totals and monthly averages are computed in SQL.
 
 Semantic layer is intentionally thin: a few revenue / risk metrics and `current_interest` / `banking_payment_remark` dimensions.
+
+`customer_segmentation_model` unions every `*_customer_segmentation` model (including `demo_customer_segmentation` and workshop copies).
 
 ## Patterns in the book
 
