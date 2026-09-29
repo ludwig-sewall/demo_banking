@@ -1,7 +1,7 @@
-name: "demo_banking"
+name: "op_banking"
 version: "1.0.0"
 config-version: 2
-profile: "demo_banking"
+profile: "op_banking"
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
@@ -15,7 +15,7 @@ vars:
   demo_as_of_date: "2026-03-31"
 
 models:
-  demo_banking:
+  op_banking:
     +materialized: view
     marts:
       +schema: marts
@@ -23,5 +23,5 @@ models:
       +materialized: table
 
 seeds:
-  demo_banking:
+  op_banking:
     +schema: banking_seeds
