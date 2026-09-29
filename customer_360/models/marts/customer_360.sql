@@ -85,7 +85,9 @@ select
     case when banking.party_key is not null then 1 else 0 end
     + case when insurance.party_key is not null then 1 else 0 end
     + case when wealth.party_key is not null then 1 else 0 end
-  )::integer as domain_count
+  )::integer as domain_count,
+
+  cast('2026-03-31' as date) as as_of_date
 from parties
 left join banking
   on parties.party_key = banking.party_key
