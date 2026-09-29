@@ -1,4 +1,3 @@
--- depends_on: {{ ref('policies') }}
 with active_policies as (
   select
     insurance_customer_id,
