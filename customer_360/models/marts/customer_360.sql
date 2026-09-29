@@ -38,13 +38,11 @@ wealth as (
 financials as (
   select
     party_key,
-    sum(revenue)::numeric(18, 2) as trailing_revenue,
-    sum(cost)::numeric(18, 2) as trailing_cost,
-    sum(profit)::numeric(18, 2) as trailing_profit,
+    sum(revenue)::numeric(18, 2) as total_revenue,
+    sum(cost)::numeric(18, 2) as total_cost,
+    sum(profit)::numeric(18, 2) as total_profit,
     count(*)::integer as profit_months
   from {{ ref('op_financials', 'customer_profitability') }}
-  where month > '{{ var("demo_as_of_date") }}'::date - interval '12 months'
-    and month <= '{{ var("demo_as_of_date") }}'::date
   group by 1
 ),
 
@@ -78,18 +76,16 @@ select
   coalesce(wealth.portfolio_count, 0)::integer as portfolio_count,
   coalesce(wealth.assets_under_management, 0)::numeric(18, 2) as assets_under_management,
 
-  coalesce(financials.trailing_revenue, 0)::numeric(18, 2) as trailing_revenue,
-  coalesce(financials.trailing_cost, 0)::numeric(18, 2) as trailing_cost,
-  coalesce(financials.trailing_profit, 0)::numeric(18, 2) as trailing_profit,
+  coalesce(financials.total_revenue, 0)::numeric(18, 2) as total_revenue,
+  coalesce(financials.total_cost, 0)::numeric(18, 2) as total_cost,
+  coalesce(financials.total_profit, 0)::numeric(18, 2) as total_profit,
   coalesce(financials.profit_months, 0)::integer as profit_months,
 
   (
     case when banking.party_key is not null then 1 else 0 end
     + case when insurance.party_key is not null then 1 else 0 end
     + case when wealth.party_key is not null then 1 else 0 end
-  )::integer as domain_count,
-
-  cast('{{ var("demo_as_of_date") }}' as date) as as_of_date
+  )::integer as domain_count
 from parties
 left join banking
   on parties.party_key = banking.party_key
