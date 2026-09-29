@@ -1,24 +1,44 @@
 # Customer 360
 
-Cross-domain party view. This project does not copy producer SQL. It `ref()`s public models from banking, insurance, wealth, and financials.
+Feature table for group customers: domain revenue, payment and claims signals, service notes, and current interest. Ready for a later `customer_segmentation_model` on the same grain.
 
 | Model | Access | Grain |
 |---|---|---|
-| `customer_360` | public, contracted, semantic model | party |
-| `next_best_action` | public, contracted | party |
-| `customer_profit_month` | protected, semantic model | party + month |
+| `customer_360` | public, contracted, semantic model | customer |
+| `next_best_action` | public, contracted | customer |
+| `customer_profit_month` | protected | party + month (mesh lineage) |
 | `time_spine_daily` | protected | day |
 
-Party crosswalk logic lives inside `customer_360`. Slice attributes (`segment`, `region`, `channel`, `lifecycle`, `value_tier`) come from the `party_profile` seed.
+`customer_360` is seeded from `customer_book` and hashes `customer_id` with the shared `anonymize` package (`customer_id_hash`). Totals and monthly averages are computed in SQL.
 
-`profit_12m` sums `customer_profitability` for months inside the trailing twelve months ending on `demo_as_of_date` (2026-03-31). The demo book runs October 2025 through March 2026, so the published figure is that window.
+Semantic layer is intentionally thin: a few revenue / risk metrics and `current_interest` / `banking_payment_remark` dimensions.
 
-## Wire-up in dbt Cloud / Fusion
+## Patterns in the book
 
-1. Create a project whose subdirectory is `customer_360`.
-2. Add project dependencies on `op_banking`, `op_insurance`, `op_wealth`, and `op_financials`. `dependencies.yml` lists them.
-3. Build the four upstream projects first, then `dbt build` here.
+| Id | Pattern | Why it matters later |
+|---|---|---|
+| C001 | Rate-shop mortgage + portfolio review | Refinance / retain |
+| C002 | Deposit-heavy, no wealth revenue | Classic wealth cross-sell |
+| C003 | Monthly investor, no insurance | Investment plan |
+| C004 | Gambling loss + missed payments | Distress / payment support |
+| C005 | Claims contact storm | Claim resolution |
+| C006 | €50M business prospect | Commercial whale |
+| C007 | Late payment + credit ask | Credit increase |
+| C008 | High AUM, silent for 14 months | Reactivation |
+| C009 | Quote-shopper, near end of student loan | Bundled protection |
+| C010 | Wealth-only family office | Cash management |
+| C011 | Happy multi-product | Advocacy / retain |
+| C012 | Many small paid claims | Fraud watch |
+| C013 | Seasonal SME facility | Working capital |
+| C014 | Job-loss hardship | Hardship support |
+| C015 | Brand-new digital account | Onboarding nudge |
+
+## Wire-up
+
+1. Project subdirectory `customer_360`, run `dbt deps` (local `../anonymize`).
+2. Upstream deps in `dependencies.yml` still support `customer_profit_month`.
+3. `dbt build`.
 
 ## Exercises
 
-See [EXERCISES.md](../EXERCISES.md). Uncomment the `when` branches in `next_best_action` and replace `todo` with `retain`. Group the semantic model by `relationship`, `profit_band`, `segment`, or `recommended_action`.
+See [EXERCISES.md](../EXERCISES.md). Complete `next_best_action` from the 360 feature columns.
