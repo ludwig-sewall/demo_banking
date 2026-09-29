@@ -1,4 +1,3 @@
--- depends_on: {{ ref('clients') }}
 select
   client_id::varchar as wealth_customer_id,
   party_key::varchar as party_key,
