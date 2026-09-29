@@ -13,6 +13,7 @@
 select
   cast(null as varchar) as customer_id,
   cast(null as varchar) as segment,
+  cast(null as varchar) as recommended_action,
   cast(null as varchar) as author,
   cast(null as date) as as_of_date
 where 1 = 0
@@ -21,6 +22,7 @@ where 1 = 0
 select
   customer_id::varchar as customer_id,
   segment::varchar as segment,
+  recommended_action::varchar as recommended_action,
   '{{ model_name }}'::varchar as author,
   as_of_date::date as as_of_date
 from {{ ref(model_name) }}
