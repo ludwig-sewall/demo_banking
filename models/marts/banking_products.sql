@@ -16,7 +16,7 @@ outstanding_loans as (
   where lower(loan_status) = 'outstanding'
   group by 1
 )
-
+-- Fix
 select
   customers.banking_customer_id,
   coalesce(open_accounts.account_count, 0)::integer as account_count,

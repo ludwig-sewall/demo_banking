@@ -1,0 +1,16 @@
+customer_id,banking_revenue_eur,wealth_revenue_eur,insurance_revenue_eur,banking_missed_payments,banking_payment_remark,insurance_claims,insurance_successful_claims,customer_service_notes,current_interest
+C001,2900,1250,700,0,No,0,0,"Banking: Requested a mortgage amortization statement three times; offered a lower rate elsewhere | Wealth: Requested a portfolio review",Mortgage refinancing
+C002,520,0,0,0,No,0,0,"Banking: Holds €95k in deposits | Wealth: Wants to invest €75k and requested a proposal",Wealth management
+C003,240,880,0,0,No,0,0,"Wealth: Plans to invest €1,500 monthly | Insurance: Asked about home cover",Investment plan
+C004,2100,0,660,2,Yes,0,0,"Banking: Lost €200k gambling and missed two mortgage payments | Insurance: Car policy renewal approaching",Payment support
+C005,310,0,630,0,No,2,1,"Insurance: Called claims support 150 times; one claim approved and one under review | Banking: Asked about an overdraft",Claim resolution
+C006,10800,0,1600,0,No,0,0,"Banking: Considering moving a €50M business relationship to us | Insurance: Requested a liability cover proposal",Business banking
+C007,1900,0,900,1,No,0,0,"Banking: Requested more credit after a late payment and weaker forecast | Insurance: Liability policy renewal approaching",Credit increase
+C008,180,4200,0,0,No,0,0,"Wealth: €4.2M AUM but no advisor contact in 14 months | Banking: Salary account only; never opens app notifications",Reactivation
+C009,95,0,1480,0,No,1,1,"Insurance: Compared three home quotes and bought the mid-tier | Banking: Student loan almost paid; asking about a first credit card",Bundled protection
+C010,0,9800,0,0,No,0,0,"Wealth: Family office wants a sweep account and same-day FX | Banking: Entire operating cash sits at a competitor",Cash management
+C011,1450,620,510,0,No,0,0,"Banking: Happy with mortgage and cards | Wealth: Topped up ISA | Insurance: Renewed home and travel without shopping",Advocacy
+C012,640,0,220,0,No,4,4,"Insurance: Four small travel claims all paid within a week | Banking: Flagged two card disputes that reversed cleanly",Fraud watch
+C013,7600,0,2100,0,No,0,0,"Banking: Seasonal SME; draws a €2M revolving facility every Q4 | Insurance: Warehouse fire cover gap flagged by broker",Working capital
+C014,410,150,0,3,Yes,0,0,"Banking: Three missed card payments after a job loss; collections left two voicemails | Wealth: Tiny ETF still open",Hardship support
+C015,70,0,90,0,No,0,0,"Banking: Opened digital current account last week | Insurance: Clicked a pet-insurance banner then bounced",Onboarding nudge
