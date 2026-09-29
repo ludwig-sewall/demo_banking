@@ -27,8 +27,6 @@ models:
         data_tests:
           - not_null
           - accepted_values:
-              config:
-                severity: warn
               arguments:
                 values: [active, inactive, closed]
 
