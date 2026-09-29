@@ -8,7 +8,7 @@ Five projects in this repo. Start in **`op_banking`** Studio IDE (branch from `m
 | `insurance/` | `op_insurance` | `insurance_customer`, `insurance_policies` |
 | `wealth/` | `op_wealth` | `wealth_customer`, `wealth_portfolios` |
 | `financials/` | `op_financials` | `customer_profitability` |
-| `customer_360/` | `op_customer_360` | `customer_360` (refs the four domains) |
+| `customer_360/` | `op_customer_360` | `customer_360` (refs the four domains; plus a tiny `time_spine_daily` for the Semantic Layer) |
 
 ---
 
