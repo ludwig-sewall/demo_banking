@@ -8,9 +8,10 @@ The Banking project (`op_banking`) is already built in Production. Create a feat
 
 **Problem:** A Production test warns that a customer has an invalid status. Find the customer before changing any data.
 
-1. Open Catalog, select Production, and search for `banking_customer`.
-2. Open the model’s Tests and find the `customer_status` warning. Allowed values are `active`, `inactive`, and `closed`.
-3. Open the test and click Preview to inspect the failing rows. You can also click Edit in Studio on the model and use the Preview icon there.
+1. Open **Catalog**, select **Production**, and open the **account lineage** (or Explore lineage) view so you can see how models connect across the account.
+2. From lineage, open the relevant model: `banking_customer` in `op_banking`.
+3. Open the model’s **Tests** and find the `customer_status` warning. Allowed values are `active`, `inactive`, and `closed`.
+4. Open the test and click **Preview** to inspect the failing rows. You can also click Edit in Studio on the model and use the Preview icon there.
 
 **Finish when:** You know which customer is causing the warning and what status they have.
 
@@ -55,12 +56,12 @@ The Banking project (`op_banking`) is already built in Production. Create a feat
 
 ## 4. Break a contract and review the impact
 
-**Problem:** Customer 360 depends on Banking’s public `banking_customer` model. A missing contracted column should be caught before it reaches Production.
+**Problem:** `banking_customer` is a public contracted model. A missing contracted column should be caught before it reaches Production.
 
 1. On a new branch, open `models/marts/banking_customer.sql` in Studio IDE and remove `party_key` from the final select. Leave `contract.enforced: true` and the column declaration in `models/marts/_marts.yml`.
 2. Click the model’s Build icon or run `dbt build --select banking_customer`. Open the contract error in the run results.
 3. Commit and push the change to a PR. From the PR’s dbt check, open **Advanced CI → Compare changes** to review what changed relative to Production. Check the result written back to GitHub.
-4. Restore `party_key`, push again, and confirm the build and CI pass. In Catalog, open the model’s lineage to see its Customer 360 dependency.
+4. Restore `party_key`, push again, and confirm the build and CI pass. In Catalog, open `banking_customer` lineage to see `banking_products` and other downstreams.
 
 **Finish when:** You have seen the contract failure, reviewed the PR in Advanced CI, and restored a passing build. Do not merge the version with the missing column. [docs.getdbt.com](https://docs.getdbt.com/docs/mesh/govern/model-contracts)
 
@@ -87,40 +88,20 @@ The Banking project (`op_banking`) is already built in Production. Create a feat
 
 ---
 
-## 6. Publish your own next best action model
+## 6. Publish your customer segmentation
 
-**Problem:** `customer_360` is a feature table (revenue, missed payments, claims, service notes, current interest). Complete recommendation logic and publish it.
+**Problem:** Segment the `customer_360` feature table (with a recommended action per customer), then fold every published segmentation into one union model.
 
 1. Open `op_customer_360` → Develop → Studio IDE and create a branch. Preview `customer_360` first — note `customer_id_hash` from the `anonymize` macro.
-2. Duplicate `models/marts/next_best_action.sql` as `models/marts/<your_name>_next_best_action.sql`.
-3. Complete the case logic. Output `customer_id`, `recommended_action`, and `as_of_date`:
-
-   | Condition | Recommended action |
-   |---|---|
-   | ≥2 missed payments and payment remark Yes | `payment_support` |
-   | More claims opened than successful | `claim_resolution` |
-   | No wealth revenue, modest banking, notes mention invest | `wealth_management` |
-   | Banking revenue ≥ 10,000 | `business_banking` |
-   | High wealth revenue, thin banking | `reactivation` |
-   | Otherwise | `retain` |
-
-4. Add the model to `models/marts/_marts.yml` with `access: public` and a description naming you as the author.
-5. Click Build and Preview on your model, or run `dbt build --select <your_name>_next_best_action`.
-6. Open a PR, review the CI checks, and merge. After the Production job runs, find your model in Catalog.
-
-**Finish when:** Your public model is available in Production for another project to reference with `ref('op_customer_360', '<your_name>_next_best_action')`.
-
----
-
-## 7. Publish your customer segmentation
-
-**Problem:** Segment the `customer_360` feature table, then fold every published segmentation into one union model.
-
-1. Open `op_customer_360` → Develop → Studio IDE and create a branch.
 2. Copy `models/marts/demo_customer_segmentation.sql` to `models/marts/<your_name>_customer_segmentation.sql`.
-3. Adjust the `case` rules. Output `customer_id`, `segment`, and `as_of_date`. Suggested labels: `payment_distress`, `claims_friction`, `commercial_whale`, `dormant_wealth`, `wealth_opportunity`, `onboarding`, `loyalist`, `credit_intensity`, `commercial_expand`, `unclassified`.
+3. Adjust the `case` rules. Output `customer_id`, `segment`, `recommended_action`, and `as_of_date`.
+
+   Suggested segments: `payment_distress`, `claims_friction`, `commercial_whale`, `dormant_wealth`, `wealth_opportunity`, `onboarding`, `loyalist`, `credit_intensity`, `commercial_expand`, `unclassified`.
+
+   Suggested actions: `payment_support`, `claim_resolution`, `wealth_management`, `business_banking`, `reactivation`, `retain`.
+
 4. Add your model to `models/marts/_marts.yml` with `access: public` and a short author description.
 5. Build your model, then build `customer_segmentation_model`. It unions every `*_customer_segmentation` model and tags each row with `author` = the model name.
 6. Open a PR, merge, and confirm Production shows both your model and your rows inside `customer_segmentation_model`.
 
-**Finish when:** `ref('op_customer_360', 'customer_segmentation_model')` includes your author and segments.
+**Finish when:** `ref('op_customer_360', 'customer_segmentation_model')` includes your author, segments, and recommended actions.
