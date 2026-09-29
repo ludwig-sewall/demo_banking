@@ -101,7 +101,7 @@ The Banking project (`op_banking`) is already built in Production. Create a feat
    Suggested actions: `payment_support`, `claim_resolution`, `wealth_management`, `business_banking`, `reactivation`, `retain`.
 
 4. Add your model to `models/marts/_marts.yml` with `access: public` and a short author description.
-5. Build your model, then build `customer_segmentation_model`. It unions every `*_customer_segmentation` model and tags each row with `author` = the model name.
+5. Build your model. Then edit `customer_segmentation_model.sql` and add a `union all` branch that `ref()`s your model (see the commented example in that file). Build `customer_segmentation_model`.
 6. Open a PR, merge, and confirm Production shows both your model and your rows inside `customer_segmentation_model`.
 
 **Finish when:** `ref('op_customer_360', 'customer_segmentation_model')` includes your author, segments, and recommended actions.
