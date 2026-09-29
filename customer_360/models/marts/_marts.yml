@@ -117,9 +117,9 @@ models:
 
   - name: demo_customer_segmentation
     description: >
-      Example customer segmentation published as demo_customer_segmentation.
-      Includes segment and recommended_action. Workshop participants copy this
-      pattern to <their_name>_customer_segmentation.
+      Example customer segmentation with segment and recommended_action.
+      Workshop participants copy this pattern to
+      <developer>_customer_segmentation_model.
     config:
       access: public
       contract:
@@ -155,8 +155,9 @@ models:
 
   - name: customer_segmentation_model
     description: >
-      Union of every *_customer_segmentation model in this project
-      (including demo_customer_segmentation and participant models).
+      Optional union of published segmentation models (starts with
+      demo_customer_segmentation). Workshop exercise 6 builds a separate
+      <developer>_customer_segmentation_model.
     config:
       access: public
       contract:
