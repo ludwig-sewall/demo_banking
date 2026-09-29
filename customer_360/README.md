@@ -5,9 +5,9 @@ Feature table for group customers: domain revenue, payment and claims signals, s
 | Model | Access | Grain |
 |---|---|---|
 | `customer_360` | public, contracted, semantic model | customer |
-| `next_best_action` | public, contracted | customer |
 | `demo_customer_segmentation` | public, contracted | customer |
 | `customer_segmentation_model` | public, contracted | customer + author |
+| `mesh_lineage_anchors` | protected | domain |
 | `customer_profit_month` | protected | party + month (mesh lineage) |
 | `time_spine_daily` | protected | day |
 
@@ -15,7 +15,9 @@ Feature table for group customers: domain revenue, payment and claims signals, s
 
 Semantic layer is intentionally thin: a few revenue / risk metrics and `current_interest` / `banking_payment_remark` dimensions.
 
-`customer_segmentation_model` unions every `*_customer_segmentation` model (including `demo_customer_segmentation` and workshop copies).
+`customer_segmentation_model` unions every `*_customer_segmentation` model (including `demo_customer_segmentation` and workshop copies). Each row carries `segment` and `recommended_action`.
+
+`mesh_lineage_anchors` refs public models from banking, insurance, wealth, and financials so Account Lineage shows the full mesh.
 
 ## Patterns in the book
 
