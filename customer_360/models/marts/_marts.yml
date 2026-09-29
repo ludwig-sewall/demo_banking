@@ -67,16 +67,16 @@ models:
         description: Sum of open portfolio market value.
         data_type: number(18,2)
         constraints: [{type: not_null}]
-      - name: trailing_revenue
-        description: Trailing 12-month revenue from financials.
+      - name: total_revenue
+        description: Sum of revenue from financials (all months).
         data_type: number(18,2)
         constraints: [{type: not_null}]
-      - name: trailing_cost
-        description: Trailing 12-month cost from financials.
+      - name: total_cost
+        description: Sum of cost from financials (all months).
         data_type: number(18,2)
         constraints: [{type: not_null}]
-      - name: trailing_profit
-        description: Trailing 12-month profit from financials.
+      - name: total_profit
+        description: Sum of profit from financials (all months).
         data_type: number(18,2)
         constraints: [{type: not_null}]
       - name: profit_months
@@ -86,10 +86,6 @@ models:
       - name: domain_count
         description: How many of banking / insurance / wealth the party appears in.
         data_type: integer
-        constraints: [{type: not_null}]
-      - name: as_of_date
-        description: Demo reporting date (demo_as_of_date).
-        data_type: date
         constraints: [{type: not_null}]
 
 exposures:
