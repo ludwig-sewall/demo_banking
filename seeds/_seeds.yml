@@ -27,7 +27,7 @@ seeds:
       - name: account_id
         data_tests: [unique, not_null]
   - name: loans
-    description: Loan facilities. Harbor Logistics carries a negative outstanding balance on purpose.
+    description: Loan facilities across retail and commercial customers (mortgage, auto, working capital, acquisition).
     config:
       column_types:
         loan_id: varchar
