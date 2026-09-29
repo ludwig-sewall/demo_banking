@@ -4,4 +4,4 @@ select
   revenue,
   cost,
   profit
-from {{ ref('demo_banking_financials', 'customer_profitability') }}
+from {{ ref('op_financials', 'customer_profitability') }}
