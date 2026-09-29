@@ -3,34 +3,21 @@
   "title": "Customer 360 metrics",
   "suggested": [
     "How many customers do we have?",
-    "What is trailing profit by relationship?",
-    "Show profit by recommended action",
-    "Trailing profit by segment and region",
-    "Monthly profit, revenue, and cost"
+    "Total revenue by current interest",
+    "Missed payments by payment remark",
+    "Insurance claims by current interest",
+    "Monthly average revenue by interest"
   ],
   "metrics": [
-    {"name": "customers", "label": "Customers", "description": "Parties on the group customer 360."},
-    {"name": "trailing_profit", "label": "Trailing profit", "description": "Sum of trailing-twelve-month profit."},
-    {"name": "total_assets_under_management", "label": "Assets under management", "description": "Open wealth assets across parties."},
-    {"name": "total_loan_balance", "label": "Loan balance", "description": "Outstanding loan principal across parties."},
-    {"name": "total_annual_premium", "label": "Annual premium", "description": "In-force insurance premium across parties."},
-    {"name": "profit_per_customer", "label": "Profit per customer", "description": "Trailing profit divided by customers."},
-    {"name": "customers_in_loss", "label": "Customers in loss", "description": "Parties with negative trailing profit."},
-    {"name": "full_relationship_customers", "label": "Full relationship customers", "description": "Parties present in banking, insurance, and wealth."},
-    {"name": "monthly_profit", "label": "Monthly profit", "description": "Profit by calendar month."},
-    {"name": "monthly_revenue", "label": "Monthly revenue", "description": "Revenue by calendar month."},
-    {"name": "monthly_cost", "label": "Monthly cost", "description": "Allocated cost by calendar month."}
+    {"name": "customers", "label": "Customers", "description": "Customers on the 360."},
+    {"name": "total_revenue", "label": "Total revenue", "description": "Sum of total_revenue_eur."},
+    {"name": "avg_monthly_revenue", "label": "Monthly avg revenue", "description": "Sum of monthly_avg_revenue_eur."},
+    {"name": "missed_payments", "label": "Missed payments", "description": "Sum of banking missed payments."},
+    {"name": "open_claims", "label": "Insurance claims", "description": "Sum of insurance claims opened."}
   ],
   "dimensions": [
-    {"name": "party__relationship", "label": "Relationship"},
-    {"name": "party__profit_band", "label": "Profit band"},
-    {"name": "party__segment", "label": "Segment"},
-    {"name": "party__region", "label": "Region"},
-    {"name": "party__channel", "label": "Channel"},
-    {"name": "party__lifecycle", "label": "Lifecycle"},
-    {"name": "party__value_tier", "label": "Value tier"},
-    {"name": "party__recommended_action", "label": "Recommended action"},
-    {"name": "metric_time__month", "label": "Month"}
+    {"name": "customer__current_interest", "label": "Current interest"},
+    {"name": "customer__banking_payment_remark", "label": "Payment remark"}
   ],
   "intents": [
     {
@@ -38,36 +25,24 @@
       "metrics": ["customers"]
     },
     {
-      "match": ["trailing profit", "profit by relationship", "profit relationship"],
-      "metrics": ["customers", "trailing_profit"],
-      "groupBy": ["party__relationship", "party__profit_band"]
+      "match": ["revenue", "total revenue", "by interest"],
+      "metrics": ["customers", "total_revenue"],
+      "groupBy": ["customer__current_interest"]
     },
     {
-      "match": ["segment", "region", "value tier", "lifecycle", "channel"],
-      "metrics": ["customers", "trailing_profit"],
-      "groupBy": ["party__segment", "party__region", "party__value_tier"]
+      "match": ["missed payment", "payment remark"],
+      "metrics": ["customers", "missed_payments"],
+      "groupBy": ["customer__banking_payment_remark"]
     },
     {
-      "match": ["recommended action", "next best", "nba"],
-      "metrics": ["customers", "trailing_profit"],
-      "groupBy": ["party__recommended_action"]
+      "match": ["claim", "insurance claim"],
+      "metrics": ["customers", "open_claims"],
+      "groupBy": ["customer__current_interest"]
     },
     {
-      "match": ["monthly", "by month", "revenue and cost"],
-      "metrics": ["monthly_profit", "monthly_revenue", "monthly_cost"],
-      "groupBy": ["metric_time__month"]
-    },
-    {
-      "match": ["aum", "assets under management", "wealth"],
-      "metrics": ["total_assets_under_management", "customers"]
-    },
-    {
-      "match": ["loan", "lending"],
-      "metrics": ["total_loan_balance", "customers"]
-    },
-    {
-      "match": ["premium", "insurance"],
-      "metrics": ["total_annual_premium", "customers"]
+      "match": ["monthly", "average revenue"],
+      "metrics": ["avg_monthly_revenue", "customers"],
+      "groupBy": ["customer__current_interest"]
     }
   ]
 }
