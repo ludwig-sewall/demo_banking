@@ -1,0 +1,7 @@
+version: 2
+
+data_tests:
+  - name: assert_domain_count_in_range
+    description: >
+      domain_count is how many of banking, insurance, and wealth contributed a row;
+      it must stay between 0 and 3 for each party on customer_360.
