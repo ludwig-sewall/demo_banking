@@ -3,11 +3,10 @@ version: 2
 models:
   - name: customer_360
     description: >
-      Public group customer 360. Grain is one row per party.
-      Product measures are null when the party is absent from that domain,
-      and zero when they are a customer with nothing open.
-      profit_12m is trailing-twelve-month profit from customer_profitability,
-      and is null when finance has no complete months for the party.
+      Public customer 360 feature table. One row per customer with domain
+      revenue, payment and claims signals, service notes, and current interest.
+      customer_id_hash is produced with the shared anonymize macro.
+      Built for a later customer_segmentation_model on the same grain.
     config:
       access: public
       contract:
@@ -16,94 +15,69 @@ models:
       enabled: true
     agg_time_dimension: as_of_date
     columns:
-      - name: party_key
-        description: Group party key.
+      - name: customer_id
+        description: Clear demo customer id (C001…).
         data_type: varchar
         constraints: [{type: not_null}]
         data_tests: [unique, not_null]
         entity:
           type: primary
-          name: party
-      - name: banking_customer_id
-        description: Banking customer id, null when the party has no bank relationship.
-        data_type: varchar
-        data_tests:
-          - relationships:
-              arguments:
-                to: ref('op_banking', 'banking_customer')
-                field: banking_customer_id
-      - name: insurance_customer_id
-        description: Insurance customer id, null when the party has no policy relationship.
-        data_type: varchar
-        data_tests:
-          - relationships:
-              arguments:
-                to: ref('op_insurance', 'insurance_customer')
-                field: insurance_customer_id
-      - name: wealth_customer_id
-        description: Wealth client id, null when the party has no wealth relationship.
-        data_type: varchar
-        data_tests:
-          - relationships:
-              arguments:
-                to: ref('op_wealth', 'wealth_customer')
-                field: wealth_customer_id
-      - name: segment
-        description: Party segment for portfolio slicing.
+          name: customer
+      - name: customer_id_hash
+        description: Anonymized customer id (sha2 / md5 via anonymize macro).
         data_type: varchar
         constraints: [{type: not_null}]
-        dimension:
-          type: categorical
-      - name: region
-        description: Party region.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        dimension:
-          type: categorical
-      - name: channel
-        description: Primary servicing channel.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        dimension:
-          type: categorical
-      - name: lifecycle
-        description: Relationship lifecycle stage.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        dimension:
-          type: categorical
-      - name: value_tier
-        description: Value tier for the party.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        dimension:
-          type: categorical
-      - name: account_count
-        description: Open banking accounts. Null when the party is not a banking customer.
-        data_type: integer
-      - name: loan_count
-        description: Outstanding loan facilities. Null when the party is not a banking customer.
-        data_type: integer
-      - name: loan_balance
-        description: Outstanding loan principal. Null when the party is not a banking customer.
+        data_tests: [unique, not_null]
+      - name: banking_revenue_eur
+        description: Trailing banking revenue in EUR.
         data_type: number(18,2)
-      - name: active_policy_count
-        description: In-force policies. Null when the party is not an insurance customer.
+        constraints: [{type: not_null}]
+      - name: wealth_revenue_eur
+        description: Trailing wealth revenue in EUR.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: insurance_revenue_eur
+        description: Trailing insurance revenue in EUR.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: total_revenue_eur
+        description: Sum of banking, wealth, and insurance revenue.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: monthly_avg_revenue_eur
+        description: total_revenue_eur / 12.
+        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: banking_missed_payments
+        description: Count of missed banking payments in the trailing window.
         data_type: integer
-      - name: annual_premium
-        description: In-force annual premium. Null when the party is not an insurance customer.
-        data_type: number(18,2)
-      - name: portfolio_count
-        description: Open portfolios. Null when the party is not a wealth client.
+        constraints: [{type: not_null}]
+      - name: banking_payment_remark
+        description: Yes when payments are under formal remark / watch.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        dimension:
+          type: categorical
+      - name: insurance_claims
+        description: Insurance claims opened in the trailing window.
         data_type: integer
-      - name: assets_under_management
-        description: Open portfolio market value. Null when the party is not a wealth client.
-        data_type: number(18,2)
-      - name: profit_12m
-        description: Sum of monthly profit inside the trailing twelve months. Null when no complete month exists.
-        data_type: number(18,2)
+        constraints: [{type: not_null}]
+      - name: insurance_successful_claims
+        description: Claims paid or approved.
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: customer_service_notes
+        description: Free-text service context across domains (pipe-separated).
+        data_type: varchar
+        constraints: [{type: not_null}]
+      - name: current_interest
+        description: Current commercial interest / opportunity theme.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        dimension:
+          type: categorical
       - name: as_of_date
-        description: Demo reporting date. Every row shares demo_as_of_date.
+        description: Demo reporting date (demo_as_of_date).
         data_type: date
         constraints: [{type: not_null}]
         granularity: day
@@ -111,124 +85,78 @@ models:
           type: time
     metrics:
       - name: customers
-        description: Parties on the group customer 360.
+        description: Customers on the 360.
         label: Customers
         type: simple
         agg: count
         expr: "1"
-      - name: trailing_profit
-        description: Sum of trailing-twelve-month profit. Parties with no complete month are skipped.
-        label: Trailing profit
+      - name: total_revenue
+        description: Sum of total_revenue_eur.
+        label: Total revenue
         type: simple
         agg: sum
-        expr: profit_12m
-      - name: total_assets_under_management
-        description: Open wealth assets across parties.
-        label: Assets under management
+        expr: total_revenue_eur
+      - name: avg_monthly_revenue
+        description: Sum of monthly_avg_revenue_eur.
+        label: Monthly avg revenue
         type: simple
         agg: sum
-        expr: assets_under_management
-      - name: total_loan_balance
-        description: Outstanding loan principal across parties.
-        label: Loan balance
+        expr: monthly_avg_revenue_eur
+      - name: missed_payments
+        description: Sum of banking missed payments.
+        label: Missed payments
         type: simple
         agg: sum
-        expr: loan_balance
-      - name: total_annual_premium
-        description: In-force insurance premium across parties.
-        label: Annual premium
+        expr: banking_missed_payments
+      - name: open_claims
+        description: Sum of insurance claims opened.
+        label: Insurance claims
         type: simple
         agg: sum
-        expr: annual_premium
-      - name: profit_per_customer
-        description: Trailing profit divided by customer count.
-        label: Profit per customer
-        type: derived
-        expr: trailing_profit / customers
-        input_metrics:
-          - name: trailing_profit
-          - name: customers
-      - name: customers_in_loss
-        description: Parties whose trailing profit is below zero.
-        label: Customers in loss
-        type: simple
-        agg: count
-        expr: "1"
-        filter: "{{ Dimension('party__profit_band') }} = 'loss'"
-      - name: full_relationship_customers
-        description: Parties present in banking, insurance, and wealth.
-        label: Full relationship customers
-        type: simple
-        agg: count
-        expr: "1"
-        filter: "{{ Dimension('party__relationship') }} = 'all_three'"
-    derived_semantics:
-      dimensions:
-        - name: relationship
-          type: categorical
-          label: Relationship
-          description: Which books this party is in.
-          expr: >
-            case
-              when banking_customer_id is not null and insurance_customer_id is not null and wealth_customer_id is not null then 'all_three'
-              when banking_customer_id is not null and insurance_customer_id is not null then 'bank_and_insurance'
-              when banking_customer_id is not null and wealth_customer_id is not null then 'bank_and_wealth'
-              when insurance_customer_id is not null and wealth_customer_id is not null then 'insurance_and_wealth'
-              when banking_customer_id is not null then 'banking_only'
-              when insurance_customer_id is not null then 'insurance_only'
-              when wealth_customer_id is not null then 'wealth_only'
-              else 'none'
-            end
-        - name: profit_band
-          type: categorical
-          label: Profit band
-          description: Trailing-twelve-month profit bucket.
-          expr: >
-            case
-              when profit_12m is null then 'unknown'
-              when profit_12m < 0 then 'loss'
-              when profit_12m < 1000 then 'thin'
-              else 'healthy'
-            end
+        expr: insurance_claims
 
   - name: next_best_action
     description: >
-      One recommended action per party. The published value is todo until
-      the case branches in the model are uncommented.
+      One recommended action per customer. Starter logic is commented so
+      workshop participants can complete their own version.
     config:
       access: public
       contract:
         enforced: true
     semantic_model:
-      enabled: true
+      enabled: false
     columns:
-      - name: party_key
-        description: Group party key. One action per party.
+      - name: customer_id
+        description: Customer id. One action per customer.
         data_type: varchar
         constraints: [{type: not_null}]
         entity:
           type: primary
-          name: party
+          name: customer
         data_tests:
           - unique
           - not_null
           - relationships:
               arguments:
                 to: ref('customer_360')
-                field: party_key
+                field: customer_id
       - name: recommended_action
-        description: Action to take for this party. todo means the exercise is still open.
+        description: Action to take. todo means the exercise is still open.
         data_type: varchar
         constraints: [{type: not_null}]
-        dimension:
-          type: categorical
         data_tests:
           - not_null
           - accepted_values:
               config:
                 severity: warn
               arguments:
-                values: [restructure_credit, offer_insurance, offer_wealth, priority_review, retain]
+                values:
+                  - payment_support
+                  - claim_resolution
+                  - wealth_management
+                  - business_banking
+                  - reactivation
+                  - retain
       - name: as_of_date
         description: Demo reporting date. Matches customer_360.
         data_type: date
@@ -236,28 +164,21 @@ models:
 
   - name: customer_profit_month
     description: >
-      Monthly profit for each party, from financials. One row per party and month
-      that has both revenue and cost. This is the time series under the snapshot.
+      Monthly profit for each party from financials. Kept for mesh lineage;
+      not exposed as a semantic model.
     config:
       access: protected
     semantic_model:
-      enabled: true
-    agg_time_dimension: profit_month
+      enabled: false
     columns:
       - name: party_key
         description: Group party key.
         data_type: varchar
         constraints: [{type: not_null}]
-        entity:
-          type: primary
-          name: party
       - name: profit_month
         description: First day of the profit month.
         data_type: date
         constraints: [{type: not_null}]
-        granularity: month
-        dimension:
-          type: time
       - name: revenue
         description: Priced revenue for the month.
         data_type: number(18,2)
@@ -267,25 +188,6 @@ models:
       - name: profit
         description: Revenue minus cost.
         data_type: number(18,2)
-    metrics:
-      - name: monthly_profit
-        description: Profit in the month.
-        label: Monthly profit
-        type: simple
-        agg: sum
-        expr: profit
-      - name: monthly_revenue
-        description: Revenue in the month.
-        label: Monthly revenue
-        type: simple
-        agg: sum
-        expr: revenue
-      - name: monthly_cost
-        description: Allocated cost in the month.
-        label: Monthly cost
-        type: simple
-        agg: sum
-        expr: cost
 
   - name: time_spine_daily
     description: One reporting date for the demo, used by the customer_360 semantic model.
@@ -309,4 +211,4 @@ exposures:
       email: customer360@example.com
     depends_on:
       - ref('customer_360')
-    description: Cross-domain holdings and trailing profit for each party.
+    description: Customer feature table for revenue, risk signals, and interest themes.
