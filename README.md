@@ -2,6 +2,8 @@
 
 Five projects in this repo. Start in **`op_banking`** Studio IDE (branch from `main`). Use Preview, Build, and Test — or the Command bar.
 
+**Ask the data:** [Natural-language metric chat](https://ludwig-sewall.github.io/op_banking/) on GitHub Pages (Customer 360 Semantic Layer).
+
 | Directory | Project | Public models |
 |---|---|---|
 | *(root)* | `op_banking` | `banking_customer`, `banking_products` |
