@@ -12,6 +12,7 @@ models:
         enforced: true
     semantic_model:
       enabled: true
+    agg_time_dimension: as_of_date
     columns:
       - name: customer_id
         description: Group party key (P-…).
@@ -98,8 +99,13 @@ models:
         description: How many of banking / insurance / wealth the party appears in.
         data_type: integer
         constraints: [{type: not_null}]
+      - name: as_of_date
+        description: Reporting date for the Semantic Layer (fixed demo date).
+        data_type: date
+        constraints: [{type: not_null}]
+        granularity: day
         dimension:
-          type: categorical
+          type: time
     metrics:
       - name: customers
         description: Parties on the customer 360.
@@ -125,3 +131,16 @@ models:
         type: simple
         agg: sum
         expr: assets_under_management
+
+  - name: time_spine_daily
+    description: Minimal day spine required by the Semantic Layer.
+    config:
+      access: protected
+    time_spine:
+      standard_granularity_column: date_day
+    columns:
+      - name: date_day
+        description: Reporting day.
+        data_type: date
+        granularity: day
+        data_tests: [unique, not_null]
