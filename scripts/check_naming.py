@@ -19,7 +19,6 @@ PROJECTS: tuple[tuple[str, str | None, frozenset[str] | None], ...] = (
         None,
         frozenset(
             {
-                "group_customer",
                 "customer_360",
                 "next_best_action",
                 "time_spine_daily",
