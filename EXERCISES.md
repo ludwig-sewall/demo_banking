@@ -78,18 +78,13 @@ When several domains publish customer data, shared macros help them apply the sa
 
 ---
 
-## 6. Create a customer segmentation model
+## 6. Explore the mesh-fed customer 360
 
-Build a segmentation directly in the `op_customer_360` project, with a recommended action for each customer.
+`op_customer_360` has a single model. It is built from public models in banking, insurance, wealth, and financials — not from local seeds.
 
-1. Open `op_customer_360` → Develop → Studio IDE and create a branch. Preview `customer_360` to see the available customer signals.
-2. Copy `models/marts/demo_customer_segmentation.sql` to `models/marts/<developer>_customer_segmentation_model.sql`.
-3. Edit the case rules. Return `customer_id`, `segment`, `recommended_action`, and `as_of_date`. Use `ref('customer_360')` to read the model in the same project.
+1. Open Catalog → Production → account lineage. Find `customer_360` and confirm its parents come from the four domain projects.
+2. Open `op_customer_360` → Develop → Studio IDE. Preview `customer_360`.
+3. Pick one `customer_id` (`party_key`) and note which domains it appears in (`banking_customer_id`, `insurance_customer_id`, `wealth_customer_id`, `domain_count`) and its trailing profit.
+4. Optional: add a simple derived column (for example a `case` on `domain_count` or `loan_balance`) directly in `models/marts/customer_360.sql`, update the contract in `_marts.yml`, then Build and Preview.
 
-   Possible segments: `payment_distress`, `claims_friction`, `commercial_whale`, `dormant_wealth`, `wealth_opportunity`, `onboarding`, `loyalist`, `credit_intensity`, `commercial_expand`, `unclassified`.
-
-   Possible actions: `payment_support`, `claim_resolution`, `wealth_management`, `business_banking`, `reactivation`, `retain`.
-
-4. Click **Build** on your model, then Preview the segments and recommended actions.
-
-**Done when:** Your `<developer>_customer_segmentation_model` builds and returns an action for each customer.
+**Done when:** You can explain how one party row is assembled from cross-project `ref()`s.
