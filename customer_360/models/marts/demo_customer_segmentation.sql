@@ -1,5 +1,5 @@
--- Example published segmentation. Copy to <your_name>_customer_segmentation.sql
--- and tune the rules; customer_segmentation_model unions every such model.
+-- Example segmentation. Copy to <developer>_customer_segmentation_model.sql
+-- and tune the case rules (segment + recommended_action).
 
 select
   customer_id,
