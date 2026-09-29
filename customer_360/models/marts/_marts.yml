@@ -157,8 +157,69 @@ models:
                   - business_banking
                   - reactivation
                   - retain
+                  - todo
       - name: as_of_date
         description: Demo reporting date. Matches customer_360.
+        data_type: date
+        constraints: [{type: not_null}]
+
+  - name: demo_customer_segmentation
+    description: >
+      Example customer segmentation published as demo_customer_segmentation.
+      Workshop participants copy this pattern to <their_name>_customer_segmentation.
+    config:
+      access: public
+      contract:
+        enforced: true
+    semantic_model:
+      enabled: false
+    columns:
+      - name: customer_id
+        description: Customer id from customer_360.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('customer_360')
+                field: customer_id
+      - name: segment
+        description: Segment label produced by the demo rules.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [not_null]
+      - name: as_of_date
+        description: Demo reporting date. Matches customer_360.
+        data_type: date
+        constraints: [{type: not_null}]
+
+  - name: customer_segmentation_model
+    description: >
+      Union of every *_customer_segmentation model in this project
+      (including demo_customer_segmentation and participant models).
+    config:
+      access: public
+      contract:
+        enforced: true
+    semantic_model:
+      enabled: false
+    columns:
+      - name: customer_id
+        description: Customer id from a published segmentation model.
+        data_type: varchar
+        constraints: [{type: not_null}]
+      - name: segment
+        description: Segment label from the authoring model.
+        data_type: varchar
+        constraints: [{type: not_null}]
+      - name: author
+        description: Source model name (e.g. demo_customer_segmentation).
+        data_type: varchar
+        constraints: [{type: not_null}]
+      - name: as_of_date
+        description: Demo reporting date.
         data_type: date
         constraints: [{type: not_null}]
 
@@ -211,4 +272,5 @@ exposures:
       email: customer360@example.com
     depends_on:
       - ref('customer_360')
-    description: Customer feature table for revenue, risk signals, and interest themes.
+      - ref('customer_segmentation_model')
+    description: Customer feature table and published segmentations.
