@@ -1,6 +1,6 @@
 # Customer 360
 
-Feature table for group customers: domain revenue, payment and claims signals, service notes, and current interest. Ready for a later `customer_segmentation_model` on the same grain.
+Feature table for group customers: domain revenue, payment and claims signals, service notes, and current interest. Ready for a later segmentation model on the same grain.
 
 | Model | Access | Grain |
 |---|---|---|
@@ -15,7 +15,7 @@ Feature table for group customers: domain revenue, payment and claims signals, s
 
 Semantic layer is intentionally thin: a few revenue / risk metrics and `current_interest` / `banking_payment_remark` dimensions.
 
-`customer_segmentation_model` unions every `*_customer_segmentation` model (including `demo_customer_segmentation` and workshop copies). Each row carries `segment` and `recommended_action`.
+Workshop exercise 6: copy `demo_customer_segmentation` to `<developer>_customer_segmentation_model` (segment + recommended_action). `customer_segmentation_model` remains an optional union of published segmentations.
 
 `mesh_lineage_anchors` refs public models from banking, insurance, wealth, and financials so Account Lineage shows the full mesh.
 
@@ -38,6 +38,26 @@ Semantic layer is intentionally thin: a few revenue / risk metrics and `current_
 | C013 | Seasonal SME facility | Working capital |
 | C014 | Job-loss hardship | Hardship support |
 | C015 | Brand-new digital account | Onboarding nudge |
+| C016 | Dual-income mortgage top-up | Refinance / retain |
+| C017 | Large idle deposits | Wealth cross-sell |
+| C018 | Monthly equity DCA | Investment plan |
+| C019 | Divorce payment distress | Payment support |
+| C020 | Delayed storm claim | Claim resolution |
+| C021 | Group treasury RFP | Commercial whale |
+| C022 | Late cards + credit ask | Credit increase |
+| C023 | High AUM, silent 18 months | Reactivation |
+| C024 | First-home insurance shopper | Bundled protection |
+| C025 | Family office cash elsewhere | Cash management |
+| C026 | Happy multi-product | Advocacy / retain |
+| C027 | Many micro claims | Fraud watch |
+| C028 | Seasonal inventory RCF | Working capital |
+| C029 | Hardship application | Hardship support |
+| C030 | Student digital account | Onboarding nudge |
+| C031 | Green renovation loan | Credit increase |
+| C032 | Insurance-only open claim | Claim resolution |
+| C033 | SME personal + business | Business banking |
+| C034 | Advisory → discretionary | Investment plan |
+| C035 | Clinic group expansion | Working capital |
 
 ## Wire-up
 
@@ -47,4 +67,4 @@ Semantic layer is intentionally thin: a few revenue / risk metrics and `current_
 
 ## Exercises
 
-See [EXERCISES.md](../EXERCISES.md). Publish `<you>_customer_segmentation` (segment + recommended_action) and union it into `customer_segmentation_model`.
+See [EXERCISES.md](../EXERCISES.md). Copy `demo_customer_segmentation` to `<developer>_customer_segmentation_model` (segment + recommended_action) and build it.
