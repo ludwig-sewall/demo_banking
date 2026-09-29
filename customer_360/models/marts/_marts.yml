@@ -115,58 +115,11 @@ models:
         agg: sum
         expr: insurance_claims
 
-  - name: next_best_action
-    description: >
-      One recommended action per customer. Starter logic is commented so
-      workshop participants can complete their own version.
-    config:
-      access: public
-      contract:
-        enforced: true
-    semantic_model:
-      enabled: false
-    columns:
-      - name: customer_id
-        description: Customer id. One action per customer.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        entity:
-          type: primary
-          name: customer
-        data_tests:
-          - unique
-          - not_null
-          - relationships:
-              arguments:
-                to: ref('customer_360')
-                field: customer_id
-      - name: recommended_action
-        description: Action to take. todo means the exercise is still open.
-        data_type: varchar
-        constraints: [{type: not_null}]
-        data_tests:
-          - not_null
-          - accepted_values:
-              config:
-                severity: warn
-              arguments:
-                values:
-                  - payment_support
-                  - claim_resolution
-                  - wealth_management
-                  - business_banking
-                  - reactivation
-                  - retain
-                  - todo
-      - name: as_of_date
-        description: Demo reporting date. Matches customer_360.
-        data_type: date
-        constraints: [{type: not_null}]
-
   - name: demo_customer_segmentation
     description: >
       Example customer segmentation published as demo_customer_segmentation.
-      Workshop participants copy this pattern to <their_name>_customer_segmentation.
+      Includes segment and recommended_action. Workshop participants copy this
+      pattern to <their_name>_customer_segmentation.
     config:
       access: public
       contract:
@@ -187,6 +140,11 @@ models:
                 field: customer_id
       - name: segment
         description: Segment label produced by the demo rules.
+        data_type: varchar
+        constraints: [{type: not_null}]
+        data_tests: [not_null]
+      - name: recommended_action
+        description: Next best action for this customer in the segment.
         data_type: varchar
         constraints: [{type: not_null}]
         data_tests: [not_null]
@@ -214,6 +172,10 @@ models:
         description: Segment label from the authoring model.
         data_type: varchar
         constraints: [{type: not_null}]
+      - name: recommended_action
+        description: Recommended action from the authoring model.
+        data_type: varchar
+        constraints: [{type: not_null}]
       - name: author
         description: Source model name (e.g. demo_customer_segmentation).
         data_type: varchar
@@ -221,6 +183,22 @@ models:
       - name: as_of_date
         description: Demo reporting date.
         data_type: date
+        constraints: [{type: not_null}]
+
+  - name: mesh_lineage_anchors
+    description: >
+      Cross-project count anchors so Account Lineage includes banking,
+      insurance, wealth, and financials beside customer_360.
+    config:
+      access: protected
+    columns:
+      - name: domain
+        description: Mesh domain label.
+        data_type: varchar
+        constraints: [{type: not_null}]
+      - name: customers
+        description: Row count from the upstream public model.
+        data_type: integer
         constraints: [{type: not_null}]
 
   - name: customer_profit_month
