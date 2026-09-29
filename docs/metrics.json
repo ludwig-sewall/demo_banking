@@ -1,10 +1,11 @@
 {
-  "project": "demo_banking_customer_360",
+  "project": "op_customer_360",
   "title": "Customer 360 metrics",
   "suggested": [
     "How many customers do we have?",
     "What is trailing profit by relationship?",
     "Show profit by recommended action",
+    "Trailing profit by segment and region",
     "Monthly profit, revenue, and cost"
   ],
   "metrics": [
@@ -23,6 +24,11 @@
   "dimensions": [
     {"name": "party__relationship", "label": "Relationship"},
     {"name": "party__profit_band", "label": "Profit band"},
+    {"name": "party__segment", "label": "Segment"},
+    {"name": "party__region", "label": "Region"},
+    {"name": "party__channel", "label": "Channel"},
+    {"name": "party__lifecycle", "label": "Lifecycle"},
+    {"name": "party__value_tier", "label": "Value tier"},
     {"name": "party__recommended_action", "label": "Recommended action"},
     {"name": "metric_time__month", "label": "Month"}
   ],
@@ -35,6 +41,11 @@
       "match": ["trailing profit", "profit by relationship", "profit relationship"],
       "metrics": ["customers", "trailing_profit"],
       "groupBy": ["party__relationship", "party__profit_band"]
+    },
+    {
+      "match": ["segment", "region", "value tier", "lifecycle", "channel"],
+      "metrics": ["customers", "trailing_profit"],
+      "groupBy": ["party__segment", "party__region", "party__value_tier"]
     },
     {
       "match": ["recommended action", "next best", "nba"],
