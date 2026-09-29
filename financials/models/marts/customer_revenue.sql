@@ -1,4 +1,3 @@
--- depends_on: {{ ref('revenue_transactions') }}
 select
   party_key::varchar as party_key,
   month::date as month,
