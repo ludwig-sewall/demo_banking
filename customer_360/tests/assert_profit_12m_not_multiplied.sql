@@ -2,7 +2,7 @@ with expected as (
   select
     party_key,
     sum(profit) as profit_12m
-  from {{ ref('demo_banking_financials', 'customer_profitability') }}
+  from {{ ref('op_financials', 'customer_profitability') }}
   where {{ trailing_profit_months('month') }}
   group by 1
 )
