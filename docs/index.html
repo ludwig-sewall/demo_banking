@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>op_banking · Ask Customer 360</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #0c1220;
+      --bg1: #141c2c;
+      --bg2: #1c2740;
+      --ink: #eef3fa;
+      --muted: #93a4bd;
+      --accent: #3dd6c6;
+      --accent2: #6ea8ff;
+      --danger: #ff7b72;
+      --radius: 16px;
+      --font: "DM Sans", "Segoe UI", sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 520px at 8% -8%, #1a3558 0%, transparent 55%),
+        radial-gradient(900px 480px at 100% 0%, #123a36 0%, transparent 50%),
+        linear-gradient(180deg, #0c1220 0%, #101828 100%);
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 28px 18px 48px; }
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+      letter-spacing: -0.04em;
+      font-weight: 700;
+    }
+    header .brand {
+      display: inline-block;
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    header p { margin: 0; color: var(--muted); max-width: 40rem; line-height: 1.5; }
+    .panel {
+      margin-top: 22px;
+      background: color-mix(in srgb, var(--bg1) 92%, transparent);
+      border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+      border-radius: var(--radius);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+    .chat {
+      height: min(58vh, 520px);
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .bubble {
+      max-width: 88%;
+      padding: 11px 14px;
+      border-radius: 14px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .bubble.user {
+      align-self: flex-end;
+      background: color-mix(in srgb, var(--accent2) 26%, var(--bg2));
+    }
+    .bubble.bot { align-self: flex-start; background: var(--bg2); }
+    .bubble.bot table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.92rem;
+      font-family: var(--mono);
+    }
+    .bubble.bot th, .bubble.bot td {
+      text-align: left;
+      padding: 5px 8px;
+      border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+    }
+    .composer {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+      background: color-mix(in srgb, var(--bg0) 40%, var(--bg1));
+    }
+    .composer input {
+      flex: 1;
+      border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+      background: var(--bg0);
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+    }
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 0 16px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--accent);
+      color: #04221e;
+    }
+    button.secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+    }
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .suggestions button {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      padding: 8px 12px;
+      font-weight: 500;
+      font-size: 0.92rem;
+    }
+    details.settings {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    details.settings summary { cursor: pointer; color: var(--ink); margin-bottom: 10px; }
+    .settings-grid { display: grid; gap: 10px; }
+    .settings-grid label { display: grid; gap: 4px; }
+    .settings-grid input {
+      border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+      background: var(--bg1);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+    }
+    .hint { margin-top: 8px; color: var(--muted); font-size: 0.85rem; }
+    .err { color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">op_banking</div>
+      <h1>Ask Customer 360</h1>
+      <p>
+        Natural-language questions over the mesh-fed <code>customer_360</code> semantic model.
+        Paste a Semantic Layer service token below to run live queries in the browser.
+      </p>
+    </header>
+
+    <div class="suggestions" id="suggestions"></div>
+
+    <div class="panel">
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <form class="composer" id="form">
+        <input id="q" type="text" placeholder="Ask about customers, profit, AUM…" autocomplete="off" />
+        <button type="submit">Ask</button>
+      </form>
+    </div>
+
+    <details class="settings" open>
+      <summary>Semantic Layer connection (stored only in this browser)</summary>
+      <div class="settings-grid">
+        <label>GraphQL host
+          <input id="slHost" placeholder="https://mv907.semantic-layer.eu1.dbt.com/api/graphql" />
+        </label>
+        <label>Environment ID
+          <input id="slEnv" placeholder="74367" />
+        </label>
+        <label>Service token
+          <input id="slToken" type="password" placeholder="dbtc_…" />
+        </label>
+        <div>
+          <button type="button" class="secondary" id="saveSettings">Save</button>
+        </div>
+      </div>
+      <p class="hint">
+        Use a dbt Cloud service token with Semantic Layer access for
+        <code>op_customer_360</code> Production (env <code>74367</code>).
+        The token stays in localStorage and is only sent to the GraphQL host above.
+      </p>
+    </details>
+  </div>
+
+  <script>
+    const STORAGE = "op_banking_sl_v2";
+    const DEFAULTS = {
+      host: "https://mv907.semantic-layer.eu1.dbt.com/api/graphql",
+      envId: "74367",
+      token: ""
+    };
+    const chat = document.getElementById("chat");
+    const form = document.getElementById("form");
+    const q = document.getElementById("q");
+    const suggestions = document.getElementById("suggestions");
+    let catalog = { metrics: [], dimensions: [], intents: [], suggested: [] };
+
+    function loadSettings() {
+      try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(STORAGE) || "{}")); }
+      catch { return Object.assign({}, DEFAULTS); }
+    }
+    function saveSettings(s) { localStorage.setItem(STORAGE, JSON.stringify(s)); }
+    function applySettings() {
+      const s = loadSettings();
+      document.getElementById("slHost").value = s.host || DEFAULTS.host;
+      document.getElementById("slEnv").value = s.envId || DEFAULTS.envId;
+      document.getElementById("slToken").value = s.token || "";
+    }
+    document.getElementById("saveSettings").onclick = () => {
+      saveSettings({
+        host: document.getElementById("slHost").value.trim(),
+        envId: document.getElementById("slEnv").value.trim(),
+        token: document.getElementById("slToken").value.trim()
+      });
+      addBot("Saved Semantic Layer settings in this browser.");
+    };
+
+    function addBubble(text, who) {
+      const el = document.createElement("div");
+      el.className = "bubble " + who;
+      el.textContent = text;
+      chat.appendChild(el);
+      chat.scrollTop = chat.scrollHeight;
+      return el;
+    }
+    function addBot(text) { return addBubble(text, "bot"); }
+    function addUser(text) { return addBubble(text, "user"); }
+
+    function resolveIntent(question) {
+      const low = question.toLowerCase();
+      for (const intent of catalog.intents || []) {
+        if ((intent.match || []).some((m) => low.includes(String(m).toLowerCase()))) return intent;
+      }
+      const metricHits = (catalog.metrics || []).filter((m) =>
+        low.includes(m.name.toLowerCase()) || low.includes((m.label || "").toLowerCase())
+      );
+      if (metricHits.length) return { metrics: metricHits.map((m) => m.name) };
+      return null;
+    }
+
+    function catalogAnswer(intent) {
+      const metrics = (intent.metrics || []).map((name) => {
+        const row = (catalog.metrics || []).find((m) => m.name === name);
+        return row ? `• ${row.label} (\`${row.name}\`) — ${row.description}` : `• ${name}`;
+      }).join("\n");
+      const group = (intent.groupBy || []).length
+        ? `\nGroup by: ${(intent.groupBy || []).join(", ")}`
+        : "";
+      return `Mapped to Customer 360 semantic metrics:\n${metrics}${group}\n\nAdd a Semantic Layer token above to run this live.`;
+    }
+
+    async function gql(host, token, query, variables) {
+      const res = await fetch(host.replace(/\/$/, ""), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token
+        },
+        body: JSON.stringify({ query, variables })
+      });
+      const payload = await res.json();
+      if (!res.ok) throw new Error(payload.message || res.statusText);
+      if (payload.errors && payload.errors.length) {
+        throw new Error(payload.errors.map((e) => e.message).join("; "));
+      }
+      return payload.data;
+    }
+
+    async function querySemanticLayer(intent) {
+      const s = loadSettings();
+      if (!s.token || !s.envId) return null;
+      const host = s.host || DEFAULTS.host;
+      const envId = Number(s.envId);
+      const metrics = (intent.metrics || []).map((name) => ({ name }));
+      const groupBy = (intent.groupBy || []).map((name) => ({ name }));
+
+      const created = await gql(host, s.token, `
+        mutation($envId: BigInt!, $metrics: [MetricInput!]!, $groupBy: [GroupByInput!]) {
+          createQuery(environmentId: $envId, metrics: $metrics, groupBy: $groupBy) { queryId }
+        }`, { envId, metrics, groupBy });
+      const queryId = created && created.createQuery && created.createQuery.queryId;
+      if (!queryId) throw new Error("Semantic Layer did not return a queryId");
+
+      for (let i = 0; i < 40; i++) {
+        const data = await gql(host, s.token, `
+          query($envId: BigInt!, $queryId: String!) {
+            query(environmentId: $envId, queryId: $queryId) {
+              status
+              sql
+              error
+              jsonResult
+            }
+          }`, { envId, queryId });
+        const row = data && data.query;
+        if (!row) throw new Error("Empty query poll response");
+        if (row.status === "SUCCESSFUL") return row;
+        if (row.status === "FAILED" || row.status === "ERROR") {
+          throw new Error(row.error || row.status);
+        }
+        await new Promise((r) => setTimeout(r, 700));
+      }
+      throw new Error("Timed out waiting for Semantic Layer results");
+    }
+
+    function renderResult(el, data, intent) {
+      let rows = [];
+      try {
+        rows = typeof data.jsonResult === "string" ? JSON.parse(data.jsonResult || "[]") : (data.jsonResult || []);
+      } catch { rows = []; }
+      if (!Array.isArray(rows) || !rows.length) {
+        el.textContent = "Query succeeded but returned no rows.\n\nSQL:\n" + (data.sql || "");
+        return;
+      }
+      const cols = Object.keys(rows[0]);
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const hr = document.createElement("tr");
+      cols.forEach((c) => { const th = document.createElement("th"); th.textContent = c; hr.appendChild(th); });
+      thead.appendChild(hr);
+      table.appendChild(thead);
+      const tbody = document.createElement("tbody");
+      rows.slice(0, 50).forEach((row) => {
+        const tr = document.createElement("tr");
+        cols.forEach((c) => { const td = document.createElement("td"); td.textContent = row[c]; tr.appendChild(td); });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      el.textContent = "Live Semantic Layer · " + (intent.metrics || []).join(", ");
+      el.appendChild(table);
+    }
+
+    async function ask(question) {
+      const text = String(question || "").trim();
+      if (!text) return;
+      addUser(text);
+      const intent = resolveIntent(text);
+      if (!intent) {
+        addBot("I could not map that to a metric yet. Try a suggestion, or name a metric like customers, total_profit, or assets_under_management.");
+        return;
+      }
+      const pending = addBot("Querying…");
+      try {
+        const live = await querySemanticLayer(intent);
+        if (live) {
+          pending.textContent = "";
+          renderResult(pending, live, intent);
+        } else {
+          pending.textContent = catalogAnswer(intent);
+        }
+      } catch (err) {
+        pending.innerHTML = "";
+        pending.classList.add("err");
+        pending.textContent = "Semantic Layer error: " + (err && err.message ? err.message : err) + "\n\n" + catalogAnswer(intent);
+      }
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = q.value;
+      q.value = "";
+      ask(text);
+    });
+
+    applySettings();
+    fetch("./metrics.json")
+      .then((r) => r.json())
+      .then((data) => {
+        catalog = data || catalog;
+        (catalog.suggested || []).forEach((s) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = s;
+          b.onclick = () => ask(s);
+          suggestions.appendChild(b);
+        });
+        addBot("Ready. Ask about Customer 360 metrics, or pick a suggestion.");
+      })
+      .catch(() => addBot("Could not load metrics.json — chat still works with built-in fallbacks."));
+  </script>
+</body>
+</html>
