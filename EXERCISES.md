@@ -1,6 +1,6 @@
 # dbt Platform exercises
 
-The Banking project (`demo_banking`) is already built in Production. Create a feature branch from `main` in Studio IDE. You can use the Run, Build, Test, and Preview icons in the interface for the relevant model, or enter commands in the Command bar at the bottom of Studio IDE.
+The Banking project (`op_banking`) is already built in Production. Create a feature branch from `main` in Studio IDE. You can use the Run, Build, Test, and Preview icons in the interface for the relevant model, or enter commands in the Command bar at the bottom of Studio IDE.
 
 ---
 
@@ -20,7 +20,7 @@ The Banking project (`demo_banking`) is already built in Production. Create a fe
 
 **Problem:** Your development schema is empty, so the Production row is not available there yet.
 
-1. Open `demo_banking` → Develop → Studio IDE. In the Defer menu beside the Command bar, select **Development environment**.
+1. Open `op_banking` → Develop → Studio IDE. In the Defer menu beside the Command bar, select **Development environment**.
 2. Try the Preview icon on `banking_customer`. The development relation does not exist yet.
 3. In the Command bar, run:
    ```bash
@@ -91,7 +91,7 @@ The Banking project (`demo_banking`) is already built in Production. Create a fe
 
 **Problem:** Customer 360 has starter recommendation logic. Complete your own version and publish it for other projects.
 
-1. Open `demo_banking_customer_360` → Develop → Studio IDE and create a branch.
+1. Open `op_customer_360` → Develop → Studio IDE and create a branch.
 2. Duplicate `models/marts/next_best_action.sql` as `models/marts/<your_name>_next_best_action.sql`.
 3. Complete the case logic. Output `party_key`, `recommended_action`, and `as_of_date`:
 
@@ -107,4 +107,4 @@ The Banking project (`demo_banking`) is already built in Production. Create a fe
 5. Click Build and Preview on your model, or run `dbt build --select <your_name>_next_best_action`.
 6. Open a PR, review the CI checks, and merge. After the Production job runs, find your model in Catalog.
 
-**Finish when:** Your public model is available in Production for another project to reference with `ref('demo_banking_customer_360', '<your_name>_next_best_action')`.
+**Finish when:** Your public model is available in Production for another project to reference with `ref('op_customer_360', '<your_name>_next_best_action')`.
