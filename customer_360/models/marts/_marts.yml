@@ -10,12 +10,17 @@ models:
       access: public
       contract:
         enforced: true
+    semantic_model:
+      enabled: true
     columns:
       - name: customer_id
         description: Group party key (P-…).
         data_type: varchar
         constraints: [{type: not_null}]
         data_tests: [unique, not_null]
+        entity:
+          type: primary
+          name: customer
       - name: customer_id_hash
         description: Anonymized party key via anonymize macro.
         data_type: varchar
@@ -27,6 +32,8 @@ models:
       - name: banking_status
         description: Banking relationship status.
         data_type: varchar
+        dimension:
+          type: categorical
       - name: account_count
         description: Open banking accounts.
         data_type: integer
@@ -45,6 +52,8 @@ models:
       - name: insurance_status
         description: Insurance relationship status.
         data_type: varchar
+        dimension:
+          type: categorical
       - name: active_policy_count
         description: In-force insurance policies.
         data_type: integer
@@ -59,6 +68,8 @@ models:
       - name: wealth_status
         description: Wealth relationship status.
         data_type: varchar
+        dimension:
+          type: categorical
       - name: portfolio_count
         description: Open wealth portfolios.
         data_type: integer
@@ -87,14 +98,30 @@ models:
         description: How many of banking / insurance / wealth the party appears in.
         data_type: integer
         constraints: [{type: not_null}]
-
-exposures:
-  - name: customer_360_dashboard
-    label: Customer 360
-    type: dashboard
-    owner:
-      name: Retail and wealth
-      email: customer360@example.com
-    depends_on:
-      - ref('customer_360')
-    description: Mesh-fed customer 360 feature table.
+        dimension:
+          type: categorical
+    metrics:
+      - name: customers
+        description: Parties on the customer 360.
+        label: Customers
+        type: simple
+        agg: count
+        expr: "1"
+      - name: total_revenue
+        description: Sum of total_revenue.
+        label: Total revenue
+        type: simple
+        agg: sum
+        expr: total_revenue
+      - name: total_profit
+        description: Sum of total_profit.
+        label: Total profit
+        type: simple
+        agg: sum
+        expr: total_profit
+      - name: assets_under_management
+        description: Sum of assets under management.
+        label: AUM
+        type: simple
+        agg: sum
+        expr: assets_under_management
