@@ -1,5 +1,3 @@
-{{ config(severity='warn') }}
-
 select
   insurance_customer_id,
   active_policy_count,

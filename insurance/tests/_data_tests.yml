@@ -1,0 +1,6 @@
+version: 2
+
+data_tests:
+  - name: assert_insurance_policies_non_negative
+    description: >
+      Fails when in-force policy counts or annual premium totals are negative.

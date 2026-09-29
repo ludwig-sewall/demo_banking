@@ -1,5 +1,3 @@
-{{ config(severity='warn') }}
-
 select
   wealth_customer_id,
   portfolio_count,

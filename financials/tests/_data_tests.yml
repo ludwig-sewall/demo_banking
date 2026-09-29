@@ -1,0 +1,15 @@
+version: 2
+
+data_tests:
+  - name: assert_revenue_party_month_unique
+    description: >
+      customer_revenue must stay at one row per party_key and month after aggregation.
+  - name: assert_cost_party_month_unique
+    description: >
+      customer_cost must stay at one row per party_key and month after aggregation.
+  - name: assert_profitability_party_month_unique
+    description: >
+      customer_profitability must stay at one row per party_key and month.
+  - name: assert_profit_equals_revenue_minus_cost
+    description: >
+      profit on each customer_profitability row must equal revenue minus cost.

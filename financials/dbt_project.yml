@@ -11,9 +11,6 @@ snapshot-paths: ["snapshots"]
 
 clean-targets: ["target", "dbt_packages"]
 
-  revenue_outlier_warn: 50000
-  profit_floor_warn: 0
-
 models:
   op_financials:
     +materialized: view
