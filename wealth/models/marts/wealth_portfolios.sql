@@ -1,4 +1,3 @@
--- depends_on: {{ ref('portfolios') }}
 with open_portfolios as (
   select
     client_id,
