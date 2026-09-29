@@ -89,18 +89,19 @@ The Banking project (`op_banking`) is already built in Production. Create a feat
 
 ## 6. Publish your own next best action model
 
-**Problem:** Customer 360 has starter recommendation logic. Complete your own version and publish it for other projects.
+**Problem:** `customer_360` is a feature table (revenue, missed payments, claims, service notes, current interest). Complete recommendation logic and publish it.
 
-1. Open `op_customer_360` → Develop → Studio IDE and create a branch.
+1. Open `op_customer_360` → Develop → Studio IDE and create a branch. Preview `customer_360` first — note `customer_id_hash` from the `anonymize` macro.
 2. Duplicate `models/marts/next_best_action.sql` as `models/marts/<your_name>_next_best_action.sql`.
-3. Complete the case logic. Output `party_key`, `recommended_action`, and `as_of_date`:
+3. Complete the case logic. Output `customer_id`, `recommended_action`, and `as_of_date`:
 
    | Condition | Recommended action |
    |---|---|
-   | Loss making with loans | `restructure_credit` |
-   | Banked with no policy | `offer_insurance` |
-   | Profitable with no wealth product | `offer_wealth` |
-   | Large AUM | `priority_review` |
+   | ≥2 missed payments and payment remark Yes | `payment_support` |
+   | More claims opened than successful | `claim_resolution` |
+   | No wealth revenue, modest banking, notes mention invest | `wealth_management` |
+   | Banking revenue ≥ 10,000 | `business_banking` |
+   | High wealth revenue, thin banking | `reactivation` |
    | Otherwise | `retain` |
 
 4. Add the model to `models/marts/_marts.yml` with `access: public` and a description naming you as the author.
