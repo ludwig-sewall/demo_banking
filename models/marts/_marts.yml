@@ -33,7 +33,7 @@ models:
               description: >
                 Workshop exercise: source statuses are single letters (A/I/C/F).
                 The starting CASE maps A/I/C only, so F fails until you add
-                when customer_status = 'F' then 'frozen'.
+                "when customer_status = 'F' then 'frozen'".
                 Valid published statuses are active, inactive, closed, and frozen.
               config:
                 severity: warn
