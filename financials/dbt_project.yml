@@ -1,7 +1,7 @@
-name: "{{financials_project}}"
+name: "op_financials"
 version: "1.0.0"
 config-version: 2
-profile: "{{financials_project}}"
+profile: "op_financials"
 
 model-paths: ["models"]
 seed-paths: []
@@ -12,7 +12,7 @@ snapshot-paths: ["snapshots"]
 clean-targets: ["target", "dbt_packages"]
 
 models:
-  {{financials_project}}:
+  op_financials:
     +materialized: view
     marts:
       +schema: marts

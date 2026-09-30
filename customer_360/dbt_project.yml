@@ -1,7 +1,7 @@
-name: "{{customer_360_project}}"
+name: "op_customer_360"
 version: "1.0.0"
 config-version: 2
-profile: "{{customer_360_project}}"
+profile: "op_customer_360"
 
 model-paths: ["models"]
 seed-paths: []
@@ -13,7 +13,7 @@ clean-targets: ["target", "dbt_packages"]
 
 
 models:
-  {{customer_360_project}}:
+  op_customer_360:
     +materialized: view
     marts:
       +schema: marts

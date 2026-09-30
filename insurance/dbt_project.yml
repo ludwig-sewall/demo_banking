@@ -1,7 +1,7 @@
-name: "{{insurance_project}}"
+name: "op_insurance"
 version: "1.0.0"
 config-version: 2
-profile: "{{insurance_project}}"
+profile: "op_insurance"
 
 model-paths: ["models"]
 seed-paths: []
@@ -13,7 +13,7 @@ clean-targets: ["target", "dbt_packages"]
 
 
 models:
-  {{insurance_project}}:
+  op_insurance:
     +materialized: view
     marts:
       +schema: marts
