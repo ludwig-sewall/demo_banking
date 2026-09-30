@@ -104,24 +104,6 @@ When several domains publish customer data, shared macros help them apply the sa
 
 **Done when:** You can explain how one party row is assembled from cross-project `ref()`s.
 
----
-
-## 7. Query the Semantic Layer
-
-`customer_360` publishes a slim semantic model (`customers`, `total_revenue`, `total_profit`, `assets_under_management`) with dimensions like `banking_status`. A tiny protected `time_spine_daily` model exists only so the Semantic Layer can resolve time.
-
-1. In the Platform, open **Semantic Layer** for `op_customer_360` (Production). Confirm warehouse credentials are set for the project if prompted.
-2. Run metrics `customers` and `total_profit`, grouped by `customer__banking_status`.
-3. You should see totals in this shape (counts can drift if seeds change):
-
-   | banking_status | customers | total_profit |
-   |---|---:|---:|
-   | active | 21 | 796025 |
-   | closed | 2 | 2740 |
-   | frozen | 1 | 8400 |
-   | inactive | 2 | -5880 |
-   | *(null — no banking row)* | 4 | 122720 |
-
 4. Confirm the same numbers with Preview / SQL on `customer_360` (`count(*)`, `sum(total_profit)` by `banking_status`).
 
 **Done when:** The Semantic Layer result matches the model.
