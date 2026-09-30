@@ -2,8 +2,10 @@ version: 2
 
 sources:
   - name: insurance
-    description: Policy admin book. Customers are keyed to the group party, separate from the banking customer id.
-    schema: "{{ target.schema }}_insurance_seeds"
+    description: >
+      Policy admin book in the warehouse backend (RAW_INSURANCE).
+      Customers are keyed to the group party, separate from the banking customer id.
+    schema: raw_insurance
     tables:
       - name: customers
         description: One row per insurance customer.

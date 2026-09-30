@@ -4,7 +4,8 @@ config-version: 2
 profile: "op_banking"
 
 model-paths: ["models"]
-seed-paths: ["seeds"]
+# Raw CSVs under seeds/ are loaded into Snowflake RAW_* schemas by provision — not dbt seed.
+seed-paths: ["_not_seeds"]
 test-paths: ["tests"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
@@ -19,7 +20,3 @@ models:
       +schema: marts
       +access: private
       +materialized: table
-
-seeds:
-  op_banking:
-    +schema: banking_seeds

@@ -5,8 +5,7 @@ models:
     description: >
       Public banking customer. Grain is one row per banking customer.
       party_key is the group key Customer 360 uses to line this book up
-      with insurance and wealth. Downstream projects should ref this model
-      rather than the banking seeds.
+      with insurance and wealth.       Downstream projects should ref this model rather than the banking raw sources.
     config:
       access: public
       contract:
@@ -31,12 +30,14 @@ models:
               description: Every banking customer row has a lifecycle status.
           - accepted_values:
               description: >
-                Workshop exercise: frozen in seeds is invalid until mapped in SQL.
-                Valid published statuses are active, inactive, and closed.
+                Workshop exercise: source statuses are single letters (A/I/C/F).
+                The starting CASE maps A/I/C only, so F fails until you add
+                "when customer_status = 'F' then 'frozen'".
+                Valid published statuses are active, inactive, closed, and frozen.
               config:
                 severity: warn
               arguments:
-                values: [active, inactive, closed]
+                values: [active, inactive, closed, frozen]
 
   - name: banking_products
     description: >

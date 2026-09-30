@@ -3,9 +3,9 @@ version: 2
 sources:
   - name: financials
     description: >
-      Management accounting at party grain. Revenue is transactional.
-      Cost is an allocation, and some party-months are missing a cost.
-    schema: "{{ target.schema }}_financials_seeds"
+      Management accounting at party grain in the warehouse backend (RAW_FINANCIALS).
+      Revenue is transactional. Cost is an allocation, and some party-months are missing a cost.
+    schema: raw_financials
     tables:
       - name: revenue_transactions
         description: One row per revenue posting. Amount can be null when the posting failed to price.

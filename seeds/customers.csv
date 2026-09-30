@@ -1,27 +1,27 @@
 banking_customer_id,party_key,customer_status,full_name,loaded_at
-B-1001,P-1001,active,Elena Voss,2026-03-31 00:00:00
-B-1002,P-1002,active,Jonas Berg,2026-03-31 00:00:00
-B-1004,P-1004,active,Marcus Okonkwo,2026-03-31 00:00:00
-B-1005,P-1005,closed,Sofia Lind,2026-03-31 00:00:00
-B-1006,P-1006,active,Chen Wei,2026-03-31 00:00:00
-B-1008,P-1008,active,Noah Keller,2026-03-31 00:00:00
-B-1009,P-1009,frozen,Priya Shah,2026-03-31 00:00:00
-B-1010,P-1010,inactive,Harbor Logistics,2026-03-31 00:00:00
-B-1012,P-1012,active,Tomás Álvarez,2026-03-31 00:00:00
-B-1013,P-1013,active,Freya Nilsen,2026-03-31 00:00:00
-B-1014,P-1014,active,Omar Farouk,2026-03-31 00:00:00
-B-1015,P-1015,active,Ingrid Bakker,2026-03-31 00:00:00
-B-1016,P-1016,active,Nordic Retail AB,2026-03-31 00:00:00
-B-1017,P-1017,active,Yuki Tanaka,2026-03-31 00:00:00
-B-1018,P-1018,inactive,Camille Dubois,2026-03-31 00:00:00
-B-1019,P-1019,active,Erik Johansson,2026-03-31 00:00:00
-B-1020,P-1020,active,Aisha Mensah,2026-03-31 00:00:00
-B-1021,P-1021,active,Baltic Freight Oy,2026-03-31 00:00:00
-B-1022,P-1022,closed,Hannah Price,2026-03-31 00:00:00
-B-1023,P-1023,active,Leo Martins,2026-03-31 00:00:00
-B-1024,P-1024,active,Mei Lin,2026-03-31 00:00:00
-B-1025,P-1025,active,Oskar Bergman,2026-03-31 00:00:00
-B-1027,P-1027,active,Greenfield Clinics,2026-03-31 00:00:00
-B-1028,P-1028,active,Samir Qureshi,2026-03-31 00:00:00
-B-1029,P-1029,active,Clara Hoffmann,2026-03-31 00:00:00
-B-1030,P-1030,active,Apex Ventures Ltd,2026-03-31 00:00:00
+B-1001,P-1001,A,Elena Voss,2026-03-31 00:00:00
+B-1002,P-1002,A,Jonas Berg,2026-03-31 00:00:00
+B-1004,P-1004,A,Marcus Okonkwo,2026-03-31 00:00:00
+B-1005,P-1005,C,Sofia Lind,2026-03-31 00:00:00
+B-1006,P-1006,A,Chen Wei,2026-03-31 00:00:00
+B-1008,P-1008,A,Noah Keller,2026-03-31 00:00:00
+B-1009,P-1009,F,Priya Shah,2026-03-31 00:00:00
+B-1010,P-1010,I,Harbor Logistics,2026-03-31 00:00:00
+B-1012,P-1012,A,Tomás Álvarez,2026-03-31 00:00:00
+B-1013,P-1013,A,Freya Nilsen,2026-03-31 00:00:00
+B-1014,P-1014,A,Omar Farouk,2026-03-31 00:00:00
+B-1015,P-1015,A,Ingrid Bakker,2026-03-31 00:00:00
+B-1016,P-1016,A,Nordic Retail AB,2026-03-31 00:00:00
+B-1017,P-1017,A,Yuki Tanaka,2026-03-31 00:00:00
+B-1018,P-1018,I,Camille Dubois,2026-03-31 00:00:00
+B-1019,P-1019,A,Erik Johansson,2026-03-31 00:00:00
+B-1020,P-1020,A,Aisha Mensah,2026-03-31 00:00:00
+B-1021,P-1021,A,Baltic Freight Oy,2026-03-31 00:00:00
+B-1022,P-1022,C,Hannah Price,2026-03-31 00:00:00
+B-1023,P-1023,A,Leo Martins,2026-03-31 00:00:00
+B-1024,P-1024,A,Mei Lin,2026-03-31 00:00:00
+B-1025,P-1025,A,Oskar Bergman,2026-03-31 00:00:00
+B-1027,P-1027,A,Greenfield Clinics,2026-03-31 00:00:00
+B-1028,P-1028,A,Samir Qureshi,2026-03-31 00:00:00
+B-1029,P-1029,A,Clara Hoffmann,2026-03-31 00:00:00
+B-1030,P-1030,A,Apex Ventures Ltd,2026-03-31 00:00:00

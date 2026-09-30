@@ -2,7 +2,13 @@ version: 2
 
 sources:
   - name: banking
+<<<<<<< HEAD
     description: Core banking book (RAW_BANKING).
+=======
+    description: >
+      Core banking book in the warehouse backend (RAW_BANKING).
+      One customer can hold deposit accounts and loan facilities.
+>>>>>>> baa93440f918385b8310cb2b66c9a49dd75f9c26
     schema: raw_banking
     tables:
       - name: customers
