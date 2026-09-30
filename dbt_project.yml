@@ -1,10 +1,11 @@
-name: "op_banking"
+name: "{{banking_project}}"
 version: "1.0.0"
 config-version: 2
-profile: "op_banking"
+profile: "{{banking_project}}"
 
 model-paths: ["models"]
-seed-paths: ["seeds"]
+# Raw CSVs under seeds/ are loaded into Snowflake RAW_* schemas by provision — not dbt seed.
+seed-paths: []
 test-paths: ["tests"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
@@ -13,13 +14,9 @@ clean-targets: ["target", "dbt_packages"]
 
 
 models:
-  op_banking:
+  {{banking_project}}:
     +materialized: view
     marts:
       +schema: marts
       +access: private
       +materialized: table
-
-seeds:
-  op_banking:
-    +schema: banking_seeds

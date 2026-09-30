@@ -28,7 +28,7 @@ A Production test warns that a customer has an invalid status. Source data uses 
 
 ## 2. Fix the warning in development
 
-Your development schema is empty. Use deferral and a clone to bring the Production model into development, then extend the `CASE`. Leave `seeds/customers.csv` unchanged.
+Your development schema is empty. Use deferral and a clone to bring the Production model into development, then extend the `CASE`. Leave the backend source data (`RAW_BANKING.customers`) unchanged.
 
 1. In Studio IDE, enable the **Defer** toggle beside the Command bar and select **Production** as the environment to defer to.
 2. Run the following command to clone `banking_customer` into your development schema with fresh Production data:
@@ -112,7 +112,7 @@ When several domains publish customer data, shared macros help them apply the sa
 
 1. In the Platform, open **Semantic Layer** for `op_customer_360` (Production). Confirm warehouse credentials are set for the project if prompted.
 2. Run metrics `customers` and `total_profit`, grouped by `customer__banking_status`.
-3. You should see totals in this shape (counts can drift if seeds change):
+3. You should see totals in this shape (counts can drift if source data changes):
 
    | banking_status | customers | total_profit |
    |---|---:|---:|

@@ -1,10 +1,10 @@
-name: "op_wealth"
+name: "{{wealth_project}}"
 version: "1.0.0"
 config-version: 2
-profile: "op_wealth"
+profile: "{{wealth_project}}"
 
 model-paths: ["models"]
-seed-paths: ["seeds"]
+seed-paths: []
 test-paths: ["tests"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
@@ -13,13 +13,9 @@ clean-targets: ["target", "dbt_packages"]
 
 
 models:
-  op_wealth:
+  {{wealth_project}}:
     +materialized: view
     marts:
       +schema: marts
       +access: private
       +materialized: table
-
-seeds:
-  op_wealth:
-    +schema: wealth_seeds

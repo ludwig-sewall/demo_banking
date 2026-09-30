@@ -2,8 +2,10 @@ version: 2
 
 sources:
   - name: wealth
-    description: Wealth client book. Client ids are not banking or insurance customer ids.
-    schema: "{{ target.schema }}_wealth_seeds"
+    description: >
+      Wealth client book in the warehouse backend (RAW_WEALTH).
+      Client ids are not banking or insurance customer ids.
+    schema: raw_wealth
     tables:
       - name: clients
         description: One row per wealth client.

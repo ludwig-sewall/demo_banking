@@ -1,10 +1,10 @@
-name: "op_financials"
+name: "{{financials_project}}"
 version: "1.0.0"
 config-version: 2
-profile: "op_financials"
+profile: "{{financials_project}}"
 
 model-paths: ["models"]
-seed-paths: ["seeds"]
+seed-paths: []
 test-paths: ["tests"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
@@ -12,13 +12,9 @@ snapshot-paths: ["snapshots"]
 clean-targets: ["target", "dbt_packages"]
 
 models:
-  op_financials:
+  {{financials_project}}:
     +materialized: view
     marts:
       +schema: marts
       +access: private
       +materialized: table
-
-seeds:
-  op_financials:
-    +schema: financials_seeds
