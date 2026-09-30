@@ -2,7 +2,9 @@ version: 2
 
 seeds:
   - name: customers
-    description: Banking customers, including one frozen relationship and one inactive commercial name.
+    description: >
+      Banking customers with single-letter lifecycle codes (A/I/C/F).
+      One frozen relationship (F) is left unmapped in the starting CASE.
     config:
       column_types:
         banking_customer_id: varchar
