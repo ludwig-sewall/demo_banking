@@ -1,7 +1,7 @@
-name: "{{banking_project}}"
+name: "op_banking"
 version: "1.0.0"
 config-version: 2
-profile: "{{banking_project}}"
+profile: "op_banking"
 
 model-paths: ["models"]
 # Raw CSVs under seeds/ are loaded into Snowflake RAW_* schemas by provision — not dbt seed.
@@ -14,7 +14,7 @@ clean-targets: ["target", "dbt_packages"]
 
 
 models:
-  {{banking_project}}:
+  op_banking:
     +materialized: view
     marts:
       +schema: marts
