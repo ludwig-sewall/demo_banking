@@ -6,7 +6,6 @@ select
     when customer_status = 'I' then 'inactive'
     when customer_status = 'C' then 'closed'
     when customer_status = 'F' then 'frozen'
-    -- Workshop: add a branch for 'F' → 'frozen'
     else customer_status
   end::varchar as customer_status
 from {{ source('banking', 'customers') }}
