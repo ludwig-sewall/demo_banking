@@ -3,6 +3,6 @@ select
   account_count,
   loan_count,
   loan_balance
-from {{ ref('BankProducts') }}
+from {{ ref('banking_products') }}
 where account_count < 0
    or loan_count < 0
