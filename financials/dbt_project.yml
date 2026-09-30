@@ -4,7 +4,7 @@ config-version: 2
 profile: "op_financials"
 
 model-paths: ["models"]
-seed-paths: ["seeds"]
+seed-paths: []
 test-paths: ["tests"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
@@ -18,7 +18,3 @@ models:
       +schema: marts
       +access: private
       +materialized: table
-
-seeds:
-  op_financials:
-    +schema: financials_seeds

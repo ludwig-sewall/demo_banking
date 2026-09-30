@@ -5,8 +5,7 @@ models:
     description: >
       Public banking customer. Grain is one row per banking customer.
       party_key is the group key Customer 360 uses to line this book up
-      with insurance and wealth. Downstream projects should ref this model
-      rather than the banking seeds.
+      with insurance and wealth.       Downstream projects should ref this model rather than the banking raw sources.
     config:
       access: public
       contract:

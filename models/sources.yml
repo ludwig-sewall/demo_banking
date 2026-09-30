@@ -2,8 +2,10 @@ version: 2
 
 sources:
   - name: banking
-    description: Core banking book. One customer can hold deposit accounts and loan facilities.
-    schema: "{{ target.schema }}_banking_seeds"
+    description: >
+      Core banking book in the warehouse backend (RAW_BANKING).
+      One customer can hold deposit accounts and loan facilities.
+    schema: raw_banking
     tables:
       - name: customers
         description: One row per banking customer. party_key is the group identifier shared with insurance and wealth.

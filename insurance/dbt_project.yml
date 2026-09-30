@@ -4,7 +4,7 @@ config-version: 2
 profile: "op_insurance"
 
 model-paths: ["models"]
-seed-paths: ["seeds"]
+seed-paths: []
 test-paths: ["tests"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
@@ -19,7 +19,3 @@ models:
       +schema: marts
       +access: private
       +materialized: table
-
-seeds:
-  op_insurance:
-    +schema: insurance_seeds
