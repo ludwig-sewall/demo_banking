@@ -39,7 +39,7 @@ models:
               arguments:
                 values: [active, inactive, closed, frozen]
 
-  - name: banking_products
+  - name: BankProducts
     description: >
       Public product holdings for each banking customer. Grain is one row
       per banking customer, including customers with no open accounts or loans.
