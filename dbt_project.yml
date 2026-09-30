@@ -5,7 +5,7 @@ profile: "op_banking"
 
 model-paths: ["models"]
 # Raw CSVs under seeds/ are loaded into Snowflake RAW_* schemas by provision — not dbt seed.
-seed-paths: []
+seed-paths: ["_not_seeds"]
 test-paths: ["tests"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]

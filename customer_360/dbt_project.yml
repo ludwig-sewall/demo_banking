@@ -4,7 +4,7 @@ config-version: 2
 profile: "op_customer_360"
 
 model-paths: ["models"]
-seed-paths: []
+seed-paths: ["_not_seeds"]
 test-paths: ["tests"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
