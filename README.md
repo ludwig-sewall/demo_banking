@@ -16,19 +16,19 @@ Five projects in this repo. Start in **`op_banking`** Studio IDE (branch from `m
 
 ## 1. Find the customer warning
 
-A Production test warns that a customer has an invalid status. Start with the wider lineage to understand where the model fits.
+A Production test warns that a customer has an invalid status. Source data uses one-letter codes (`A`, `I`, `C`, `F`); the model’s `CASE` only maps three of them. Start with the wider lineage to understand where the model fits.
 
 1. In Catalog, select **Production**. Explore the account-level lineage, then zoom into the `op_banking` project lineage.
-2. Open `banking_customer` and find the warning on its `customer_status` test. Valid values are `active`, `inactive`, and `closed`.
-3. Open the test and click **Preview** to see the failing row. Then choose **Edit in Studio** to open the model in Studio IDE.
+2. Open `banking_customer` and find the warning on its `customer_status` test. Valid values are `active`, `inactive`, `closed`, and `frozen`.
+3. Open the test and click **Preview** to see the failing row (status `F`). Then choose **Edit in Studio** to open the model in Studio IDE.
 
-**Done when:** You know which customer caused the warning and what status the model returned.
+**Done when:** You know which customer caused the warning and that the model returned the raw letter `F`.
 
 ---
 
 ## 2. Fix the warning in development
 
-Your development schema is empty. Use deferral and a clone to bring the Production model into development, then fix the status in code. Leave `seeds/customers.csv` unchanged.
+Your development schema is empty. Use deferral and a clone to bring the Production model into development, then extend the `CASE`. Leave `seeds/customers.csv` unchanged.
 
 1. In Studio IDE, enable the **Defer** toggle beside the Command bar and select **Production** as the environment to defer to.
 2. Run the following command to clone `banking_customer` into your development schema with fresh Production data:
@@ -38,10 +38,15 @@ Your development schema is empty. Use deferral and a clone to bring the Producti
    ```
 
 3. Preview the model or the failing test rows to find the same customer.
-4. Edit the SQL that produces `customer_status` so it handles the customer’s source value correctly. Keep the accepted values test.
+4. In `models/marts/banking_customer.sql`, add a branch to the `CASE` that maps `F`:
+
+   ```sql
+   when customer_status = 'F' then 'frozen'
+   ```
+
 5. Click **Build** on the affected model, then Preview the corrected row and check the test result.
 
-**Done when:** The customer has the intended status in development and the warning is gone.
+**Done when:** The customer shows `frozen` in development and the warning is gone.
 
 ---
 
@@ -100,3 +105,24 @@ When several domains publish customer data, shared macros help them apply the sa
 **Done when:** You can explain how one party row is assembled from cross-project `ref()`s.
 
 ---
+
+## 7. Query the Semantic Layer
+
+`customer_360` publishes a slim semantic model (`customers`, `total_revenue`, `total_profit`, `assets_under_management`) with dimensions like `banking_status`. A tiny protected `time_spine_daily` model exists only so the Semantic Layer can resolve time.
+
+1. In the Platform, open **Semantic Layer** for `op_customer_360` (Production). Confirm warehouse credentials are set for the project if prompted.
+2. Run metrics `customers` and `total_profit`, grouped by `customer__banking_status`.
+3. You should see totals in this shape (counts can drift if seeds change):
+
+   | banking_status | customers | total_profit |
+   |---|---:|---:|
+   | active | 21 | 796025 |
+   | closed | 2 | 2740 |
+   | frozen | 1 | 8400 |
+   | inactive | 2 | -5880 |
+   | *(null — no banking row)* | 4 | 122720 |
+
+4. Confirm the same numbers with Preview / SQL on `customer_360` (`count(*)`, `sum(total_profit)` by `banking_status`).
+
+**Done when:** The Semantic Layer result matches the model.
+
