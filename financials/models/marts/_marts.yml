@@ -72,3 +72,40 @@ models:
         data_type: number(18,2)
         constraints: [{type: not_null}]
         data_tests: [not_null]
+
+  - name: customer_revenue_forecast
+    description: >
+      Python model. Fits a straight line through each party's monthly
+      revenue and predicts the next month. Parties with a single month
+      keep that revenue as the forecast.
+    config:
+      access: public
+    columns:
+      - name: party_key
+        description: Group party key. One forecast row per party.
+        data_type: varchar
+        data_tests: [unique, not_null]
+      - name: history_months
+        description: Count of priced revenue months used in the fit.
+        data_type: integer
+        data_tests: [not_null]
+      - name: last_month
+        description: Latest month present in customer_revenue for the party.
+        data_type: date
+        data_tests: [not_null]
+      - name: forecast_month
+        description: Month the prediction is for (one month after last_month).
+        data_type: date
+        data_tests: [not_null]
+      - name: last_revenue
+        description: Revenue in last_month.
+        data_type: number(18,2)
+        data_tests: [not_null]
+      - name: monthly_trend
+        description: Fitted change in revenue per month. Zero when only one month exists.
+        data_type: number(18,2)
+        data_tests: [not_null]
+      - name: predicted_revenue
+        description: Forecast revenue for forecast_month.
+        data_type: number(18,2)
+        data_tests: [not_null]

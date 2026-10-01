@@ -51,13 +51,25 @@ def _sql_names(folder: Path) -> list[str]:
     return sorted(path.stem for path in folder.rglob("*.sql") if "target" not in path.parts)
 
 
+def _model_names(folder: Path) -> list[str]:
+    if not folder.is_dir():
+        return []
+    names = []
+    for path in folder.rglob("*"):
+        if "target" in path.parts:
+            continue
+        if path.suffix in {".sql", ".py"}:
+            names.append(path.stem)
+    return sorted(names)
+
+
 def violations() -> list[str]:
     found: list[str] = []
     for directory, _prefix, _allowed in PROJECTS:
         base = ROOT / directory if directory else ROOT
         project = directory
         label = directory or "banking"
-        for name in _sql_names(base / "models"):
+        for name in _model_names(base / "models"):
             message = check_model(project, name)
             if message:
                 found.append(message)
