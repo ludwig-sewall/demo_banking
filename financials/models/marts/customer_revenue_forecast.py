@@ -1,10 +1,5 @@
 def model(dbt, session):
-    """One-step revenue forecast per party from monthly history.
-
-    Fusion materializes the return value with session.create_dataframe().
-    That call accepts a list, tuple, or pandas DataFrame, and rejects a
-    Snowpark DataFrame. A list of Rows keeps names and types without pandas.
-    """
+    """One-step revenue forecast per party from monthly history."""
     dbt.config(
         materialized="table",
         packages=["pandas", "numpy"],
@@ -14,10 +9,18 @@ def model(dbt, session):
 
     import numpy as np
     import pandas as pd
-    from snowflake.snowpark import Row
+    from snowflake.snowpark.types import (
+        DateType,
+        DecimalType,
+        IntegerType,
+        StringType,
+        StructField,
+        StructType,
+    )
 
-    # to_pandas() fails inside the Snowflake procedure: the connector marks
-    # pandas missing before packaged imports run.
+    # to_pandas() fails in the Snowflake procedure: the connector marks pandas
+    # missing before the packaged imports run. Build a Snowpark frame instead
+    # so Fusion can call .write on the return value.
     rows = dbt.ref("customer_revenue").collect()
     history = pd.DataFrame([row.as_dict() for row in rows])
     history.columns = [str(column).lower() for column in history.columns]
@@ -42,15 +45,26 @@ def model(dbt, session):
 
         last_month = group["month"].iloc[-1]
         forecasts.append(
-            Row(
-                party_key=str(party_key),
-                history_months=int(len(revenues)),
-                last_month=last_month.date(),
-                forecast_month=(last_month + pd.DateOffset(months=1)).date(),
-                last_revenue=Decimal(str(round(float(revenues[-1]), 2))),
-                monthly_trend=Decimal(str(round(float(slope), 2))),
-                predicted_revenue=Decimal(str(round(float(predicted), 2))),
+            (
+                str(party_key),
+                int(len(revenues)),
+                last_month.date(),
+                (last_month + pd.DateOffset(months=1)).date(),
+                Decimal(str(round(float(revenues[-1]), 2))),
+                Decimal(str(round(float(slope), 2))),
+                Decimal(str(round(float(predicted), 2))),
             )
         )
 
-    return forecasts
+    schema = StructType(
+        [
+            StructField("party_key", StringType()),
+            StructField("history_months", IntegerType()),
+            StructField("last_month", DateType()),
+            StructField("forecast_month", DateType()),
+            StructField("last_revenue", DecimalType(18, 2)),
+            StructField("monthly_trend", DecimalType(18, 2)),
+            StructField("predicted_revenue", DecimalType(18, 2)),
+        ]
+    )
+    return session.create_dataframe(forecasts, schema)
