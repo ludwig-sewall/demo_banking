@@ -1,12 +1,13 @@
 def model(dbt, session):
-    """Churn score for each customer_360 party."""
+    """Logistic regression: probability a party is an at-risk relationship."""
     dbt.config(
         materialized="table",
-        packages=["pandas"],
+        packages=["pandas", "numpy"],
     )
 
     from decimal import Decimal
 
+    import numpy as np
     import pandas as pd
     from snowflake.snowpark.types import (
         BooleanType,
@@ -21,69 +22,88 @@ def model(dbt, session):
     customers = pd.DataFrame([row.as_dict() for row in rows])
     customers.columns = [str(column).lower() for column in customers.columns]
 
+    feature_names = [
+        "total_profit",
+        "domain_count",
+        "account_count",
+        "loan_balance",
+        "active_policy_count",
+        "annual_premium",
+        "portfolio_count",
+        "assets_under_management",
+    ]
     at_risk = {"closed", "inactive", "frozen", "f"}
 
     def flagged(value):
         if value is None or (isinstance(value, float) and pd.isna(value)):
             return False
-        return str(value).strip().lower() in at_risk
+        text = str(value).strip().lower()
+        return text in at_risk
 
     def number(value):
         if value is None or (isinstance(value, float) and pd.isna(value)):
             return 0.0
         return float(value)
 
+    matrix = np.column_stack(
+        [customers[name].map(number).to_numpy(dtype=float) for name in feature_names]
+    )
+    labels = np.array(
+        [
+            int(
+                flagged(row.banking_status)
+                or flagged(row.insurance_status)
+                or flagged(row.wealth_status)
+            )
+            for row in customers.itertuples(index=False)
+        ],
+        dtype=float,
+    )
+
+    mean = matrix.mean(axis=0)
+    scale = matrix.std(axis=0)
+    scale[scale < 1e-6] = 1.0
+    standardized = (matrix - mean) / scale
+    design = np.column_stack([np.ones(len(customers)), standardized])
+
+    weights = np.zeros(design.shape[1], dtype=float)
+    learning_rate = 0.2
+    penalty = 1.0
+    if labels.min() != labels.max():
+        for _ in range(400):
+            linear = np.clip(design @ weights, -20, 20)
+            probability = 1.0 / (1.0 + np.exp(-linear))
+            gradient = (design.T @ (probability - labels)) / len(labels)
+            regularized = penalty * weights / len(labels)
+            regularized[0] = 0.0
+            weights -= learning_rate * (gradient + regularized)
+
+    linear = np.clip(design @ weights, -20, 20)
+    probability = 1.0 / (1.0 + np.exp(-linear))
+
     scored = []
-    for row in customers.itertuples(index=False):
-        status_hit = int(
-            flagged(getattr(row, "banking_status", None))
-            or flagged(getattr(row, "insurance_status", None))
-            or flagged(getattr(row, "wealth_status", None))
-        )
-        profit_hit = int(number(getattr(row, "total_profit", None)) < 0)
-        domain_count = int(number(getattr(row, "domain_count", None)))
-        holdings = (
-            number(getattr(row, "account_count", None))
-            + number(getattr(row, "active_policy_count", None))
-            + number(getattr(row, "portfolio_count", None))
-        )
-        thin_hit = int(domain_count <= 1)
-        empty_hit = int(holdings == 0)
-        score = (0.40 * status_hit) + (0.30 * profit_hit) + (0.20 * thin_hit) + (0.10 * empty_hit)
-        reasons = []
-        if status_hit:
-            reasons.append("inactive relationship")
-        if profit_hit:
-            reasons.append("negative profit")
-        if thin_hit:
-            reasons.append("single domain")
-        if empty_hit:
-            reasons.append("no open products")
+    for index, row in enumerate(customers.itertuples(index=False)):
+        contribution = standardized[index] * weights[1:]
+        driver = feature_names[int(np.argmax(np.abs(contribution)))]
         scored.append(
             (
                 str(row.customer_id),
-                Decimal(str(round(score, 2))),
-                score >= 0.40,
-                "high" if score >= 0.40 else "medium" if score >= 0.20 else "low",
-                ", ".join(reasons) if reasons else "none",
-                status_hit,
-                profit_hit,
-                thin_hit,
-                empty_hit,
+                Decimal(str(round(float(probability[index]), 4))),
+                bool(probability[index] >= 0.5),
+                int(labels[index]),
+                driver,
+                Decimal(str(round(float(weights[0]), 4))),
             )
         )
 
     schema = StructType(
         [
             StructField("customer_id", StringType()),
-            StructField("churn_score", DecimalType(4, 2)),
+            StructField("churn_probability", DecimalType(6, 4)),
             StructField("predicted_churn", BooleanType()),
-            StructField("churn_band", StringType()),
-            StructField("churn_reasons", StringType()),
-            StructField("status_risk", IntegerType()),
-            StructField("profit_risk", IntegerType()),
-            StructField("concentration_risk", IntegerType()),
-            StructField("product_risk", IntegerType()),
+            StructField("observed_at_risk", IntegerType()),
+            StructField("strongest_feature", StringType()),
+            StructField("model_intercept", DecimalType(8, 4)),
         ]
     )
     return session.create_dataframe(scored, schema)
