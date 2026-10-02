@@ -144,3 +144,47 @@ models:
         data_type: date
         granularity: day
         data_tests: [unique, not_null]
+
+  - name: customer_churn
+    description: >
+      Python model. Scores each customer_360 party for churn from relationship
+      status, profit, how many domains they use, and whether they still hold products.
+    config:
+      access: public
+    columns:
+      - name: customer_id
+        description: Group party key. One score per customer_360 row.
+        data_type: varchar
+        data_tests: [unique, not_null]
+      - name: churn_score
+        description: Weighted score from 0 to 1. 0.40 status, 0.30 profit, 0.20 single domain, 0.10 no products.
+        data_type: number(4,2)
+        data_tests: [not_null]
+      - name: predicted_churn
+        description: True when churn_score is at least 0.40.
+        data_type: boolean
+        data_tests: [not_null]
+      - name: churn_band
+        description: high at 0.40 and above, medium at 0.20, otherwise low.
+        data_type: varchar
+        data_tests: [not_null]
+      - name: churn_reasons
+        description: Short explanation of the flags that raised the score.
+        data_type: varchar
+        data_tests: [not_null]
+      - name: status_risk
+        description: 1 when banking, insurance, or wealth status is inactive, closed, or frozen.
+        data_type: integer
+        data_tests: [not_null]
+      - name: profit_risk
+        description: 1 when total profit is negative.
+        data_type: integer
+        data_tests: [not_null]
+      - name: concentration_risk
+        description: 1 when the party appears in at most one domain.
+        data_type: integer
+        data_tests: [not_null]
+      - name: product_risk
+        description: 1 when the party has no open accounts, policies, or portfolios.
+        data_type: integer
+        data_tests: [not_null]
