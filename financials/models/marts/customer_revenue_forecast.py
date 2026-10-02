@@ -9,18 +9,10 @@ def model(dbt, session):
 
     import numpy as np
     import pandas as pd
-    from snowflake.snowpark.types import (
-        DateType,
-        DecimalType,
-        IntegerType,
-        StringType,
-        StructField,
-        StructType,
-    )
 
-    # to_pandas() fails in the Snowflake procedure: the connector marks pandas
-    # missing before the packaged imports run. Build a Snowpark frame instead
-    # so Fusion can call .write on the return value.
+    # Fusion materializes a Python model by passing the return value to
+    # create_dataframe(), which accepts a list, tuple, or pandas DataFrame.
+    # A Snowpark DataFrame cannot be written.
     rows = dbt.ref("customer_revenue").collect()
     history = pd.DataFrame([row.as_dict() for row in rows])
     history.columns = [str(column).lower() for column in history.columns]
@@ -56,15 +48,15 @@ def model(dbt, session):
             )
         )
 
-    schema = StructType(
-        [
-            StructField("party_key", StringType()),
-            StructField("history_months", IntegerType()),
-            StructField("last_month", DateType()),
-            StructField("forecast_month", DateType()),
-            StructField("last_revenue", DecimalType(18, 2)),
-            StructField("monthly_trend", DecimalType(18, 2)),
-            StructField("predicted_revenue", DecimalType(18, 2)),
-        ]
+    return pd.DataFrame(
+        forecasts,
+        columns=[
+            "party_key",
+            "history_months",
+            "last_month",
+            "forecast_month",
+            "last_revenue",
+            "monthly_trend",
+            "predicted_revenue",
+        ],
     )
-    return session.create_dataframe(forecasts, schema)
