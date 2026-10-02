@@ -9,10 +9,17 @@ def model(dbt, session):
 
     import numpy as np
     import pandas as pd
+    from snowflake.snowpark.types import (
+        DateType,
+        DecimalType,
+        IntegerType,
+        StringType,
+        StructField,
+        StructType,
+    )
 
-    # Fusion materializes a Python model by passing the return value to
-    # create_dataframe(), which accepts a list, tuple, or pandas DataFrame.
-    # A Snowpark DataFrame cannot be written.
+    # Collect instead of to_pandas(): the procedure imports pandas after the
+    # connector has already decided pandas is unavailable.
     rows = dbt.ref("customer_revenue").collect()
     history = pd.DataFrame([row.as_dict() for row in rows])
     history.columns = [str(column).lower() for column in history.columns]
@@ -48,15 +55,17 @@ def model(dbt, session):
             )
         )
 
-    return pd.DataFrame(
-        forecasts,
-        columns=[
-            "party_key",
-            "history_months",
-            "last_month",
-            "forecast_month",
-            "last_revenue",
-            "monthly_trend",
-            "predicted_revenue",
-        ],
+    schema = StructType(
+        [
+            StructField("party_key", StringType()),
+            StructField("history_months", IntegerType()),
+            StructField("last_month", DateType()),
+            StructField("forecast_month", DateType()),
+            StructField("last_revenue", DecimalType(18, 2)),
+            StructField("monthly_trend", DecimalType(18, 2)),
+            StructField("predicted_revenue", DecimalType(18, 2)),
+        ]
     )
+    # Build the Snowpark frame here from a list. Returning a pandas frame makes
+    # Fusion call create_dataframe() with a pandas class it does not recognize.
+    return session.create_dataframe(forecasts, schema)
