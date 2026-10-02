@@ -8,7 +8,10 @@ def model(dbt, session):
     import numpy as np
     import pandas as pd
 
-    history = dbt.ref("customer_revenue").to_pandas()
+    # to_pandas() fails in the Snowflake procedure: the connector decides pandas
+    # is missing before the packaged pandas/numpy imports are visible.
+    rows = dbt.ref("customer_revenue").collect()
+    history = pd.DataFrame([row.as_dict() for row in rows])
     history.columns = [str(column).lower() for column in history.columns]
     history = history.dropna(subset=["party_key", "month", "revenue"]).copy()
     history["month"] = pd.to_datetime(history["month"])
