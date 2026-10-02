@@ -1,5 +1,5 @@
 def model(dbt, session):
-    """Logistic regression: probability a party is an at-risk relationship."""
+    """Logistic regression of customer_360.has_churn from book and profit features."""
     dbt.config(
         materialized="table",
         packages=["pandas", "numpy"],
@@ -12,7 +12,6 @@ def model(dbt, session):
     from snowflake.snowpark.types import (
         BooleanType,
         DecimalType,
-        IntegerType,
         StringType,
         StructField,
         StructType,
@@ -32,33 +31,22 @@ def model(dbt, session):
         "portfolio_count",
         "assets_under_management",
     ]
-    at_risk = {"closed", "inactive", "frozen", "f"}
-
-    def flagged(value):
-        if value is None or (isinstance(value, float) and pd.isna(value)):
-            return False
-        text = str(value).strip().lower()
-        return text in at_risk
-
     def number(value):
         if value is None or (isinstance(value, float) and pd.isna(value)):
             return 0.0
         return float(value)
 
+    def churned(value):
+        if value is True or value == 1:
+            return 1.0
+        if isinstance(value, str) and value.strip().lower() in {"true", "t", "1"}:
+            return 1.0
+        return 0.0
+
     matrix = np.column_stack(
         [customers[name].map(number).to_numpy(dtype=float) for name in feature_names]
     )
-    labels = np.array(
-        [
-            int(
-                flagged(row.banking_status)
-                or flagged(row.insurance_status)
-                or flagged(row.wealth_status)
-            )
-            for row in customers.itertuples(index=False)
-        ],
-        dtype=float,
-    )
+    labels = customers["has_churn"].map(churned).to_numpy(dtype=float)
 
     mean = matrix.mean(axis=0)
     scale = matrix.std(axis=0)
@@ -90,7 +78,7 @@ def model(dbt, session):
                 str(row.customer_id),
                 Decimal(str(round(float(probability[index]), 4))),
                 bool(probability[index] >= 0.5),
-                int(labels[index]),
+                bool(labels[index] == 1.0),
                 driver,
                 Decimal(str(round(float(weights[0]), 4))),
             )
@@ -101,7 +89,7 @@ def model(dbt, session):
             StructField("customer_id", StringType()),
             StructField("churn_probability", DecimalType(6, 4)),
             StructField("predicted_churn", BooleanType()),
-            StructField("observed_at_risk", IntegerType()),
+            StructField("has_churn", BooleanType()),
             StructField("strongest_feature", StringType()),
             StructField("model_intercept", DecimalType(8, 4)),
         ]

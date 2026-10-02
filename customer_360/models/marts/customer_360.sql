@@ -6,8 +6,8 @@ with banking as (
     coalesce(p.account_count, 0) as account_count,
     coalesce(p.loan_count, 0) as loan_count,
     coalesce(p.loan_balance, 0)::numeric(18, 2) as loan_balance
-  from {{ ref('op_banking', 'banking_customer') }} as c
-  left join {{ ref('op_banking', 'banking_products') }} as p
+  from {{ ref('{{banking_project}}', 'banking_customer') }} as c
+  left join {{ ref('{{banking_project}}', 'banking_products') }} as p
     on c.banking_customer_id = p.banking_customer_id
 ),
 
@@ -18,8 +18,8 @@ insurance as (
     c.customer_status as insurance_status,
     coalesce(p.active_policy_count, 0) as active_policy_count,
     coalesce(p.annual_premium, 0)::numeric(18, 2) as annual_premium
-  from {{ ref('op_insurance', 'insurance_customer') }} as c
-  left join {{ ref('op_insurance', 'insurance_policies') }} as p
+  from {{ ref('{{insurance_project}}', 'insurance_customer') }} as c
+  left join {{ ref('{{insurance_project}}', 'insurance_policies') }} as p
     on c.insurance_customer_id = p.insurance_customer_id
 ),
 
@@ -30,8 +30,8 @@ wealth as (
     c.client_status as wealth_status,
     coalesce(p.portfolio_count, 0) as portfolio_count,
     coalesce(p.assets_under_management, 0)::numeric(18, 2) as assets_under_management
-  from {{ ref('op_wealth', 'wealth_customer') }} as c
-  left join {{ ref('op_wealth', 'wealth_portfolios') }} as p
+  from {{ ref('{{wealth_project}}', 'wealth_customer') }} as c
+  left join {{ ref('{{wealth_project}}', 'wealth_portfolios') }} as p
     on c.wealth_customer_id = p.wealth_customer_id
 ),
 
@@ -42,7 +42,7 @@ financials as (
     sum(cost)::numeric(18, 2) as total_cost,
     sum(profit)::numeric(18, 2) as total_profit,
     count(*)::integer as profit_months
-  from {{ ref('op_financials', 'customer_profitability') }}
+  from {{ ref('{{financials_project}}', 'customer_profitability') }}
   group by 1
 ),
 
@@ -86,6 +86,17 @@ select
     + case when insurance.party_key is not null then 1 else 0 end
     + case when wealth.party_key is not null then 1 else 0 end
   )::integer as domain_count,
+
+  -- Retention extract for the year ending 2026-03-31. These parties closed
+  -- or left the relationship. The flag is the outcome, not a formula of profit
+  -- or product counts, so the churn model can try to predict it.
+  parties.party_key in (
+    'P-1005', -- Sofia Lind: closed in banking, insurance, and wealth
+    'P-1009', -- Priya Shah: banking relationship frozen, then exited
+    'P-1010', -- Harbor Logistics: inactive, deposit account closed
+    'P-1018', -- Camille Dubois: inactive banking relationship
+    'P-1022'  -- Hannah Price: closed banking relationship
+  ) as has_churn,
 
   cast('2026-03-31' as date) as as_of_date
 from parties

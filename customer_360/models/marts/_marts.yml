@@ -99,6 +99,14 @@ models:
         description: How many of banking / insurance / wealth the party appears in.
         data_type: integer
         constraints: [{type: not_null}]
+      - name: has_churn
+        description: >
+          True when retention marked the party as churned in the year ending
+          2026-03-31. Covers closed books (Sofia Lind, Hannah Price), the frozen
+          exit (Priya Shah), and inactive leavers (Harbor Logistics, Camille Dubois).
+        data_type: boolean
+        constraints: [{type: not_null}]
+        data_tests: [not_null]
       - name: as_of_date
         description: Reporting date for the Semantic Layer (fixed demo date).
         data_type: date
@@ -147,10 +155,8 @@ models:
 
   - name: customer_churn
     description: >
-      Python logistic regression fit on customer_360. The label is an
-      inactive, closed, or frozen relationship in banking, insurance, or wealth.
-      Inputs are profit, domain count, and product holdings — not the status itself.
-      churn_probability is the fitted probability for that party.
+      Python logistic regression. The label is customer_360.has_churn.
+      Inputs are profit, domain count, and product holdings, not the churn flag.
     config:
       access: public
     columns:
@@ -166,9 +172,9 @@ models:
         description: True when churn_probability is at least 0.50.
         data_type: boolean
         data_tests: [not_null]
-      - name: observed_at_risk
-        description: Training label. 1 when a domain status is inactive, closed, or frozen.
-        data_type: integer
+      - name: has_churn
+        description: Training label copied from customer_360.has_churn.
+        data_type: boolean
         data_tests: [not_null]
       - name: strongest_feature
         description: Standardized input with the largest absolute effect on this row.
