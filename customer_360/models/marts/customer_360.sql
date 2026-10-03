@@ -6,8 +6,8 @@ with banking as (
     coalesce(p.account_count, 0) as account_count,
     coalesce(p.loan_count, 0) as loan_count,
     coalesce(p.loan_balance, 0)::numeric(18, 2) as loan_balance
-  from {{ ref('{{banking_project}}', 'banking_customer') }} as c
-  left join {{ ref('{{banking_project}}', 'banking_products') }} as p
+  from {{ ref('op_banking', 'banking_customer') }} as c
+  left join {{ ref('op_banking', 'banking_products') }} as p
     on c.banking_customer_id = p.banking_customer_id
 ),
 
@@ -18,8 +18,8 @@ insurance as (
     c.customer_status as insurance_status,
     coalesce(p.active_policy_count, 0) as active_policy_count,
     coalesce(p.annual_premium, 0)::numeric(18, 2) as annual_premium
-  from {{ ref('{{insurance_project}}', 'insurance_customer') }} as c
-  left join {{ ref('{{insurance_project}}', 'insurance_policies') }} as p
+  from {{ ref('op_insurance', 'insurance_customer') }} as c
+  left join {{ ref('op_insurance', 'insurance_policies') }} as p
     on c.insurance_customer_id = p.insurance_customer_id
 ),
 
@@ -30,8 +30,8 @@ wealth as (
     c.client_status as wealth_status,
     coalesce(p.portfolio_count, 0) as portfolio_count,
     coalesce(p.assets_under_management, 0)::numeric(18, 2) as assets_under_management
-  from {{ ref('{{wealth_project}}', 'wealth_customer') }} as c
-  left join {{ ref('{{wealth_project}}', 'wealth_portfolios') }} as p
+  from {{ ref('op_wealth', 'wealth_customer') }} as c
+  left join {{ ref('op_wealth', 'wealth_portfolios') }} as p
     on c.wealth_customer_id = p.wealth_customer_id
 ),
 
@@ -42,7 +42,7 @@ financials as (
     sum(cost)::numeric(18, 2) as total_cost,
     sum(profit)::numeric(18, 2) as total_profit,
     count(*)::integer as profit_months
-  from {{ ref('{{financials_project}}', 'customer_profitability') }}
+  from {{ ref('op_financials', 'customer_profitability') }}
   group by 1
 ),
 
